@@ -1,35 +1,30 @@
-import * as React from 'react';
-import { useSession } from "@auth/create/react";
-
+import * as React from "react";
+import { useUser as useClerkUser } from "@clerk/clerk-react";
 
 const useUser = () => {
-  const { data: session, status } = useSession();
-  const id = session?.user?.id
+  const { isLoaded, isSignedIn, user } = useClerkUser();
 
-  const [user, setUser] = React.useState(session?.user ?? null);
+  const formattedUser = React.useMemo(() => {
+    if (!user) return null;
 
-  const fetchUser = React.useCallback(async (session) => {
-  return session?.user;
-}, [])
+    return {
+      id: user.id,
+      email: user.emailAddresses[0]?.emailAddress,
+      name: user.fullName,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      imageUrl: user.imageUrl,
+      createdAt: user.createdAt,
+    };
+  }, [user]);
 
-  const refetchUser = React.useCallback(() => {
-    if(process.env.NEXT_PUBLIC_CREATE_ENV === "PRODUCTION") {
-      if (id) {
-        fetchUser(session).then(setUser);
-      } else {
-        setUser(null);
-      }
-    }
-  }, [fetchUser, id])
-
-  React.useEffect(refetchUser, [refetchUser]);
-
-  if (process.env.NEXT_PUBLIC_CREATE_ENV !== "PRODUCTION") {
-    return { user, data: session?.user || null, loading: status === 'loading', refetch: refetchUser };
-  }
-  return { user, data: user, loading: status === 'loading' || (status === 'authenticated' && !user), refetch: refetchUser };
+  return {
+    user: formattedUser,
+    data: formattedUser,
+    loading: !isLoaded,
+    isSignedIn,
+  };
 };
 
-export { useUser }
-
+export { useUser };
 export default useUser;

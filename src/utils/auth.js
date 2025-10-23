@@ -1,6 +1,10 @@
+// Auth utilities for Clerk integration
+// Previous fake auth implementation has been removed
+
+export {};
 // Fake authentication utilities
 
-const SESSION_KEY = 'veltrain_session';
+const SESSION_KEY = "veltrain_session";
 
 /**
  * Simulate login and store session
@@ -10,13 +14,13 @@ const SESSION_KEY = 'veltrain_session';
  */
 export function fakeLogin(username, password) {
   if (!username || !password) return false;
-  
+
   const session = {
     username,
     loginTime: Date.now(),
     isAuthenticated: true,
   };
-  
+
   localStorage.setItem(SESSION_KEY, JSON.stringify(session));
   return true;
 }

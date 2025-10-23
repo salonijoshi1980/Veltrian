@@ -1,46 +1,69 @@
-import { useCallback } from 'react';
-import { signIn, signOut } from "@auth/create/react";
+import { useCallback } from "react";
+import {
+  useAuth as useClerkAuth,
+  useSignIn,
+  useSignUp,
+} from "@clerk/clerk-react";
 
 function useAuth() {
-  const callbackUrl = typeof window !== 'undefined' 
-    ? new URLSearchParams(window.location.search).get('callbackUrl')
-    : null;
+  const { signIn, isLoaded: signInLoaded } = useSignIn();
+  const { signUp, isLoaded: signUpLoaded } = useSignUp();
+  const { userId, sessionId, getToken, isLoaded: authLoaded } = useClerkAuth();
 
-  const signInWithCredentials = useCallback((options) => {
-    return signIn("credentials-signin", {
-      ...options,
-      callbackUrl: callbackUrl ?? options.callbackUrl
-    });
-  }, [callbackUrl])
+  const signInWithCredentials = useCallback(
+    async (options) => {
+      if (!signInLoaded) return;
 
-  const signUpWithCredentials = useCallback((options) => {
-    return signIn("credentials-signup", {
-      ...options,
-      callbackUrl: callbackUrl ?? options.callbackUrl
-    });
-  }, [callbackUrl])
+      try {
+        const result = await signIn.create({
+          identifier: options.email,
+          password: options.password,
+        });
 
-  const signInWithGoogle = useCallback((options) => {
-    return signIn("google", {
-      ...options,
-      callbackUrl: callbackUrl ?? options.callbackUrl
-    });
-  }, [callbackUrl]);
-  const signInWithFacebook = useCallback((options) => {
-    return signIn("facebook", options);
-  }, []);
-  const signInWithTwitter = useCallback((options) => {
-    return signIn("twitter", options);
+        return result;
+      } catch (error) {
+        console.error("Sign in error:", error);
+        throw error;
+      }
+    },
+    [signIn, signInLoaded]
+  );
+
+  const signUpWithCredentials = useCallback(
+    async (options) => {
+      if (!signUpLoaded) return;
+
+      try {
+        const result = await signUp.create({
+          emailAddress: options.email,
+          password: options.password,
+        });
+
+        return result;
+      } catch (error) {
+        console.error("Sign up error:", error);
+        throw error;
+      }
+    },
+    [signUp, signUpLoaded]
+  );
+
+  const signOut = useCallback(async () => {
+    // Clerk handles sign out through their components
+    // We just need to redirect after sign out if needed
+    window.location.href = "/login";
   }, []);
 
   return {
     signInWithCredentials,
     signUpWithCredentials,
-    signInWithGoogle,
-    signInWithFacebook,
-    signInWithTwitter,
     signOut,
-  }
+    userId,
+    sessionId,
+    getToken,
+    isAuthenticated: !!userId,
+    isLoaded: authLoaded && signInLoaded && signUpLoaded,
+  };
 }
 
 export default useAuth;
