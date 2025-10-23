@@ -67,11 +67,11 @@ pids
 /cypress/screenshots/
 /cypress/videos/
 
-# Package manager
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
-bun.lock
+# Package manager (commit exactly one lockfile; ignore the rest if you standardize)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+# bun.lock
 
 # Build outputs
 /out-tsc

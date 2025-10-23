@@ -8,36 +8,31 @@ import { type Plugin, loadEnv } from "vite";
  * Server / SSR code is untouched.
  */
 export function viteEnvPlugin(): Plugin {
-  const viteEnv = loadEnv(
-    process.env.NODE_ENV ?? "development",
-    process.cwd(),
-    "VITE_"
-  );
-
-  const nextPublicEnv = loadEnv(
-    process.env.NODE_ENV ?? "development",
-    process.cwd(),
-    "NEXT_PUBLIC_"
-  );
-
-  const stub = `
+  let stub = "";
+  function makeStub(v: Record<string, string>, p: Record<string, string>) {
+    return `
 if (typeof window !== 'undefined') {
-  const $vite = ${JSON.stringify(viteEnv)};
-  const $public = ${JSON.stringify(nextPublicEnv)};
+  const $vite = ${JSON.stringify(v)};
+  const $public = ${JSON.stringify(p)};
   globalThis.process ??= {};
-  // Preserve any env vars set by other libraries
   const base = globalThis.process.env ?? {};
-  globalThis.process.env = new Proxy(Object.assign({}, $vite, $public, base), {
-    get(t, p) { return p in t ? t[p] : undefined; },
-    has() { return true; }
+  const $runtime = { NODE_ENV: ${JSON.stringify(process.env.NODE_ENV ?? "development")}, MODE: ${JSON.stringify(process.env.NODE_ENV ?? "development")} };
+  globalThis.process.env = new Proxy(Object.assign({}, $runtime, $vite, $public, base), {
+    get(t: Record<string, string>, q: string) { return q in t ? t[q] : undefined; },
+    has(t: Record<string, string>, q: string) { return q in t; }
   });
 }
 `;
+  }
 
   return {
     name: "vite:vite-env-plugin",
     enforce: "post",
-
+    configResolved(config) {
+      const v = loadEnv(config.mode, config.root, "VITE_");
+      const p = loadEnv(config.mode, config.root, "NEXT_PUBLIC_");
+      stub = makeStub(v, p);
+    },
     /** Inject the stub at the top of every JS/TS module compiled for the browser. */
     transform(code, id, opts) {
       if (opts?.ssr) return null; // server/SSR build → leave untouched

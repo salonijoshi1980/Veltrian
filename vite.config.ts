@@ -25,7 +25,6 @@ export default defineConfig({
       "@hono/auth-js/react",
       "@hono/auth-js",
       "@auth/core",
-      "@hono/auth-js",
       "hono/context-storage",
       "@auth/core/errors",
       "fsevents",

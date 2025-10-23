@@ -139,16 +139,19 @@ export default function AppPage() {
       setError("");
       setSuccess("");
       let uploadedCount = 0;
+      let totalChunksProcessed = 0;
+      let totalChunks = 0;
+
+      // Calculate total chunks across all files
+      for (let i = 0; i < fileList.length; i++) {
+        const chunks = await chunkFile(fileList[i]);
+        totalChunks += chunks.length;
+      }
 
       try {
         for (let i = 0; i < fileList.length; i++) {
           const file = fileList[i];
-          const totalFiles = fileList.length;
-
-          setUploadProgress(Math.round((i / totalFiles) * 100));
-
-          // Chunk the file
-          const chunks = await chunkFile(file);
+          const fileChunks = await chunkFile(file);
 
           // Save file metadata with proper MIME type detection
           const fileMetadata = {
@@ -156,15 +159,19 @@ export default function AppPage() {
             size: file.size,
             mimeType: file.type || "application/octet-stream", // Default to binary if no type
             createdAt: new Date().toISOString(),
-            totalChunks: chunks.length,
+            totalChunks: fileChunks.length,
           };
 
           const fileId = await saveFileMetadata(fileMetadata);
 
           // Encrypt and save each chunk with batch processing to prevent stack overflow
-          for (let chunkIndex = 0; chunkIndex < chunks.length; chunkIndex++) {
+          for (
+            let chunkIndex = 0;
+            chunkIndex < fileChunks.length;
+            chunkIndex++
+          ) {
             const { iv, ciphertext } = await encryptChunk(
-              chunks[chunkIndex],
+              fileChunks[chunkIndex],
               encryptionKey
             );
 
@@ -174,6 +181,12 @@ export default function AppPage() {
               iv,
               ciphertext,
             });
+
+            totalChunksProcessed++;
+            // Update progress based on chunks processed
+            setUploadProgress(
+              Math.round((totalChunksProcessed / totalChunks) * 100)
+            );
 
             // Add a small delay every 10 chunks to prevent blocking the UI
             if (chunkIndex % 10 === 0) {
@@ -490,8 +503,7 @@ export default function AppPage() {
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm font-medium text-amber-800">
-                Hello,{" "}
-                {user?.firstName || user?.username || user?.email || "User"}!
+                Hello, {user?.firstName || user?.email || "User"}!
               </span>
               <SignOutButton>
                 <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-amber-900 bg-amber-200 hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500">

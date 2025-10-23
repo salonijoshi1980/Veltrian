@@ -1,21 +1,23 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
 import { SignIn } from "@clerk/clerk-react";
 import { useAuth } from "@/utils/clerkAuth";
 
 export default function LoginPage() {
   const { isAuthenticated } = useAuth();
   const [isClient, setIsClient] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setIsClient(true);
 
     // Redirect authenticated users to the app
     if (isAuthenticated) {
-      window.location.href = "/app";
+      navigate("/app");
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, navigate]);
 
   if (!isClient) return null;
 

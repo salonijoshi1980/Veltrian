@@ -1,9 +1,11 @@
 "use client";
 
+import { useNavigate } from "react-router";
 import { useAuth } from "@/utils/clerkAuth";
 
 export default function TestAuthPage() {
   const { isLoaded, isAuthenticated, userId } = useAuth();
+  const navigate = useNavigate();
 
   if (!isLoaded) {
     return <div>Loading authentication...</div>;
@@ -28,12 +30,12 @@ export default function TestAuthPage() {
           </div>
 
           <div className="pt-4">
-            <a
-              href="/login"
+            <button
+              onClick={() => navigate("/login")}
               className="block w-full text-center py-2 px-4 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
             >
               Go to Login
-            </a>
+            </button>
           </div>
         </div>
       </div>

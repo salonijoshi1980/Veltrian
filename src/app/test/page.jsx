@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { useAuth } from "@/utils/clerkAuth";
 import { deriveKey } from "@/utils/crypto";
 
@@ -8,16 +9,17 @@ export default function TestPage() {
   const { isLoaded, isAuthenticated } = useAuth();
   const [isClient, setIsClient] = useState(false);
   const [testResult, setTestResult] = useState("");
-  const [encryptionKey, setEncryptionKey] = useState(null);
+  const navigate = useNavigate();
+  // Removed unused encryptionKey state.
 
   useEffect(() => {
     setIsClient(true);
 
     // Redirect unauthenticated users to login
     if (isLoaded && !isAuthenticated) {
-      window.location.href = "/login";
+      navigate("/login");
     }
-  }, [isLoaded, isAuthenticated]);
+  }, [isLoaded, isAuthenticated, navigate]);
 
   // Test encryption key persistence
   useEffect(() => {
@@ -37,7 +39,6 @@ export default function TestPage() {
 
             // Try to restore the encryption key from the saved passphrase
             const key = await deriveKey(savedPassphrase);
-            setEncryptionKey(key);
             setTestResult("SUCCESS: Encryption key restored successfully!");
           } else {
             setTestResult(

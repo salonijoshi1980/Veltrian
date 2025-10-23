@@ -95,7 +95,7 @@ yarn typecheck
 
 ## Project Structure
 
-```
+```text
 src/
 ├── app/              # App router structure
 │   ├── api/          # API routes
@@ -121,10 +121,10 @@ This project uses Clerk for authentication. Make sure to set up your Clerk accou
 
 To learn more about the technologies used in this project:
 
-- [React Documentation](https://reactjs.org/)
+- [React Documentation](https://react.dev/)
 - [Vite Documentation](https://vitejs.dev/)
 - [React Router Documentation](https://reactrouter.com/)
-- [Clerk Documentation](https://docs.clerk.dev/)
+- [Clerk Documentation](https://clerk.com/docs/)
 - [Tailwind CSS Documentation](https://tailwindcss.com/)
 
 ## Deployment
