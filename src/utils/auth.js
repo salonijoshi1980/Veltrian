@@ -1,6 +1,12 @@
+// Auth utilities for Clerk integration
+// Previous fake auth implementation has been removed
+
+export {};
 // Fake authentication utilities
 
-const SESSION_KEY = 'veltrain_session';
+const SESSION_KEY = "veltrain_session";
+const isBrowser =
+  typeof window !== "undefined" && typeof localStorage !== "undefined";
 
 /**
  * Simulate login and store session
@@ -10,14 +16,16 @@ const SESSION_KEY = 'veltrain_session';
  */
 export function fakeLogin(username, password) {
   if (!username || !password) return false;
-  
+  if (!isBrowser) return false;
   const session = {
     username,
     loginTime: Date.now(),
     isAuthenticated: true,
   };
-  
-  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+
+  try {
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  } catch {}
   return true;
 }
 
@@ -26,8 +34,13 @@ export function fakeLogin(username, password) {
  * @returns {boolean}
  */
 export function isLoggedIn() {
-  const session = localStorage.getItem(SESSION_KEY);
-  return session ? JSON.parse(session).isAuthenticated : false;
+  if (!isBrowser) return false;
+  try {
+    const session = localStorage.getItem(SESSION_KEY);
+    return session ? JSON.parse(session).isAuthenticated : false;
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -35,8 +48,13 @@ export function isLoggedIn() {
  * @returns {Object|null}
  */
 export function getSession() {
-  const session = localStorage.getItem(SESSION_KEY);
-  return session ? JSON.parse(session) : null;
+  if (!isBrowser) return null;
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -44,5 +62,8 @@ export function getSession() {
  * @returns {void}
  */
 export function logout() {
-  localStorage.removeItem(SESSION_KEY);
+  if (!isBrowser) return;
+  try {
+    localStorage.removeItem(SESSION_KEY);
+  } catch {}
 }

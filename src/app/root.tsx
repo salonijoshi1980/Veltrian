@@ -7,9 +7,9 @@ import {
   useAsyncError,
   useLocation,
   useRouteError,
-} from 'react-router';
+} from "react-router";
 
-import { useButton } from '@react-aria/button';
+import { useButton } from "@react-aria/button";
 import {
   useCallback,
   useEffect,
@@ -18,21 +18,20 @@ import {
   type ReactNode,
   type FC,
   Component,
-} from 'react';
-import './global.css';
+} from "react";
+import "./global.css";
 
-import fetch from '@/__create/fetch';
+import fetch from "@/__create/fetch";
+import { ClerkProvider, useClerkAuth } from "@/auth";
+import { useNavigate } from "react-router";
+import { serializeError } from "serialize-error";
+import { Toaster } from "sonner";
 // @ts-ignore
-import { SessionProvider } from '@auth/create/react';
-import { useNavigate } from 'react-router';
-import { serializeError } from 'serialize-error';
-import { Toaster } from 'sonner';
-// @ts-ignore
-import { LoadFonts } from 'virtual:load-fonts.jsx';
-import { HotReloadIndicator } from '../__create/HotReload';
-import { useSandboxStore } from '../__create/hmr-sandbox-store';
-import type { Route } from './+types/root';
-import { useDevServerHeartbeat } from '../__create/useDevServerHeartbeat';
+import { LoadFonts } from "virtual:load-fonts.jsx";
+import { HotReloadIndicator } from "../__create/HotReload";
+import { useSandboxStore } from "../__create/hmr-sandbox-store";
+import type { Route } from "./+types/root";
+import { useDevServerHeartbeat } from "../__create/useDevServerHeartbeat";
 
 export const links = () => [];
 
@@ -50,20 +49,24 @@ function SharedErrorBoundary({
   return (
     <div
       className={`fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-500 ease-out ${
-        isOpen ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
+        isOpen ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
       }`}
     >
       <div className="bg-[#18191B] text-[#F2F2F2] rounded-lg p-4 max-w-md w-full mx-4 shadow-lg">
         <div className="flex items-start gap-3">
           <div className="flex-shrink-0">
             <div className="w-8 h-8 bg-[#F2F2F2] rounded-full flex items-center justify-center">
-              <span className="text-black text-[1.125rem] leading-none">⚠</span>
+              <span className="text-black text-[1.125rem] leading-none">
+                ⚠
+              </span>
             </div>
           </div>
 
           <div className="flex flex-col gap-2 flex-1">
             <div className="flex flex-col gap-1">
-              <p className="font-light text-[#F2F2F2] text-sm">App Error Detected</p>
+              <p className="font-light text-[#F2F2F2] text-sm">
+                App Error Detected
+              </p>
               <p className="text-[#959697] text-sm font-light">
                 It looks like an error occurred while trying to use your app.
               </p>
@@ -100,9 +103,9 @@ function InternalErrorBoundary({ error: errorArg }: Route.ErrorBoundaryProps) {
       onPress: useCallback(() => {
         window.parent.postMessage(
           {
-            type: 'sandbox:web:show-logs',
+            type: "sandbox:web:show-logs",
           },
-          '*'
+          "*"
         );
       }, []),
     },
@@ -113,10 +116,10 @@ function InternalErrorBoundary({ error: errorArg }: Route.ErrorBoundaryProps) {
       onPress: useCallback(() => {
         window.parent.postMessage(
           {
-            type: 'sandbox:web:fix',
+            type: "sandbox:web:fix",
             error: serializeError(error),
           },
-          '*'
+          "*"
         );
         setIsOpen(false);
       }, [error]),
@@ -181,7 +184,10 @@ type ErrorBoundaryProps = {
 
 type ErrorBoundaryState = { hasError: boolean; error: unknown | null };
 
-class ErrorBoundaryWrapper extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+class ErrorBoundaryWrapper extends Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
   state: ErrorBoundaryState = { hasError: false, error: null };
 
   static getDerivedStateFromError(error: unknown): ErrorBoundaryState {
@@ -244,24 +250,24 @@ export function useHmrConnection(): boolean {
     /** Fired every time the WS (re‑)opens */
     const onConnect = () => setConnected(true);
 
-    import.meta.hot.on('vite:ws:disconnect', onDisconnect);
-    import.meta.hot.on('vite:ws:connect', onConnect);
+    import.meta.hot.on("vite:ws:disconnect", onDisconnect);
+    import.meta.hot.on("vite:ws:connect", onConnect);
 
     // Optional: catch the “about to full‑reload” event as a last resort
     const onFullReload = () => setConnected(false);
-    import.meta.hot.on('vite:beforeFullReload', onFullReload);
+    import.meta.hot.on("vite:beforeFullReload", onFullReload);
 
     return () => {
-      import.meta.hot?.off('vite:ws:disconnect', onDisconnect);
-      import.meta.hot?.off('vite:ws:connect', onConnect);
-      import.meta.hot?.off('vite:beforeFullReload', onFullReload);
+      import.meta.hot?.off("vite:ws:disconnect", onDisconnect);
+      import.meta.hot?.off("vite:ws:connect", onConnect);
+      import.meta.hot?.off("vite:beforeFullReload", onFullReload);
     };
   }, []);
 
   return connected;
 }
 
-const healthyResponseType = 'sandbox:web:healthcheck:response';
+const healthyResponseType = "sandbox:web:healthcheck:response";
 const useHandshakeParent = () => {
   const isHmrConnected = useHmrConnection();
   useEffect(() => {
@@ -270,66 +276,80 @@ const useHandshakeParent = () => {
       healthy: isHmrConnected,
     };
     const handleMessage = (event: MessageEvent) => {
-      if (event.data.type === 'sandbox:web:healthcheck') {
-        window.parent.postMessage(healthyResponse, '*');
+      if (event.data.type === "sandbox:web:healthcheck") {
+        window.parent.postMessage(healthyResponse, "*");
       }
     };
-    window.addEventListener('message', handleMessage);
+    window.addEventListener("message", handleMessage);
     // Immediately respond to the parent window with a healthy response in
     // case we missed the healthcheck message
-    window.parent.postMessage(healthyResponse, '*');
+    window.parent.postMessage(healthyResponse, "*");
     return () => {
-      window.removeEventListener('message', handleMessage);
+      window.removeEventListener("message", handleMessage);
     };
   }, [isHmrConnected]);
 };
 
 const useCodeGen = () => {
-  const { startCodeGen, setCodeGenGenerating, completeCodeGen, errorCodeGen, stopCodeGen } =
-    useSandboxStore();
+  const {
+    startCodeGen,
+    setCodeGenGenerating,
+    completeCodeGen,
+    errorCodeGen,
+    stopCodeGen,
+  } = useSandboxStore();
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       const { type } = event.data;
 
       switch (type) {
-        case 'sandbox:web:codegen:started':
+        case "sandbox:web:codegen:started":
           startCodeGen();
           break;
-        case 'sandbox:web:codegen:generating':
+        case "sandbox:web:codegen:generating":
           setCodeGenGenerating();
           break;
-        case 'sandbox:web:codegen:complete':
+        case "sandbox:web:codegen:complete":
           completeCodeGen();
           break;
-        case 'sandbox:web:codegen:error':
+        case "sandbox:web:codegen:error":
           errorCodeGen();
           break;
-        case 'sandbox:web:codegen:stopped':
+        case "sandbox:web:codegen:stopped":
           stopCodeGen();
           break;
       }
     };
-    window.addEventListener('message', handleMessage);
+    window.addEventListener("message", handleMessage);
     return () => {
-      window.removeEventListener('message', handleMessage);
+      window.removeEventListener("message", handleMessage);
     };
-  }, [startCodeGen, setCodeGenGenerating, completeCodeGen, errorCodeGen, stopCodeGen]);
+  }, [
+    startCodeGen,
+    setCodeGenGenerating,
+    completeCodeGen,
+    errorCodeGen,
+    stopCodeGen,
+  ]);
 };
 
 const useRefresh = () => {
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      if (event.data.type === 'sandbox:web:refresh:request') {
+      if (event.data.type === "sandbox:web:refresh:request") {
         setTimeout(() => {
           window.location.reload();
         }, 1000);
-        window.parent.postMessage({ type: 'sandbox:web:refresh:complete' }, '*');
+        window.parent.postMessage(
+          { type: "sandbox:web:refresh:complete" },
+          "*"
+        );
       }
     };
-    window.addEventListener('message', handleMessage);
+    window.addEventListener("message", handleMessage);
     return () => {
-      window.removeEventListener('message', handleMessage);
+      window.removeEventListener("message", handleMessage);
     };
   }, []);
 };
@@ -344,14 +364,14 @@ export function Layout({ children }: { children: ReactNode }) {
   const pathname = location?.pathname;
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      if (event.data.type === 'sandbox:navigation') {
+      if (event.data.type === "sandbox:navigation") {
         navigate(event.data.pathname);
       }
     };
-    window.addEventListener('message', handleMessage);
-    window.parent.postMessage({ type: 'sandbox:web:ready' }, '*');
+    window.addEventListener("message", handleMessage);
+    window.parent.postMessage({ type: "sandbox:web:ready" }, "*");
     return () => {
-      window.removeEventListener('message', handleMessage);
+      window.removeEventListener("message", handleMessage);
     };
   }, [navigate]);
 
@@ -359,10 +379,10 @@ export function Layout({ children }: { children: ReactNode }) {
     if (pathname) {
       window.parent.postMessage(
         {
-          type: 'sandbox:web:navigation',
+          type: "sandbox:web:navigation",
           pathname,
         },
-        '*'
+        "*"
       );
     }
   }, [pathname]);
@@ -383,16 +403,44 @@ export function Layout({ children }: { children: ReactNode }) {
         <Toaster position="bottom-right" />
         <ScrollRestoration />
         <Scripts />
-        <script src="https://kit.fontawesome.com/2c15cc0cc7.js" crossOrigin="anonymous" async />
+        <script
+          src="https://kit.fontawesome.com/2c15cc0cc7.js"
+          crossOrigin="anonymous"
+          async
+        />
       </body>
     </html>
   );
 }
 
+// Create a component that will provide the Clerk auth context
+function AppWithClerk() {
+  const { isLoaded } = useClerkAuth();
+
+  if (!isLoaded) {
+    return <div>Loading...</div>;
+  }
+
+  return <Outlet />;
+}
+
 export default function App() {
+  const publishableKey =
+    import.meta.env.VITE_CLERK_PUBLISHABLE_KEY ||
+    import.meta.env.CLERK_PUBLISHABLE_KEY;
+
+  if (!publishableKey) {
+    if (typeof window !== "undefined") {
+      console.error(
+        "Missing Clerk Publishable Key. Please add VITE_CLERK_PUBLISHABLE_KEY to your .env file"
+      );
+    }
+    return <Outlet />;
+  }
+
   return (
-    <SessionProvider>
-      <Outlet />
-    </SessionProvider>
+    <ClerkProvider publishableKey={publishableKey}>
+      <AppWithClerk />
+    </ClerkProvider>
   );
 }

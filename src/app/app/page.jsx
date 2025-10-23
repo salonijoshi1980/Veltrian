@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { isLoggedIn, logout, getSession } from "@/utils/auth";
+import { useAuth, useUser } from "@/utils/clerkAuth";
+import { SignOutButton } from "@clerk/clerk-react";
 import {
   deriveKey,
   chunkFile,
@@ -20,8 +21,9 @@ import {
 } from "@/utils/db";
 
 export default function AppPage() {
+  const { isLoaded, isAuthenticated } = useAuth();
+  const { isLoaded: isUserLoaded, isSignedIn, user } = useUser();
   const [isClient, setIsClient] = useState(false);
-  const [session, setSession] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -41,18 +43,46 @@ export default function AppPage() {
   const [previewUrl, setPreviewUrl] = useState("");
 
   const fileInputRef = useRef(null);
+  const backupInputRef = useRef(null);
   const dragOverlay = useRef(null);
 
   // Initialize
   useEffect(() => {
     setIsClient(true);
-    if (!isLoggedIn()) {
+
+    // Redirect unauthenticated users to login
+    if (isLoaded && !isAuthenticated) {
       window.location.href = "/login";
-    } else {
-      setSession(getSession());
-      loadFiles();
     }
-  }, []);
+  }, [isLoaded, isAuthenticated]);
+
+  // Check if we need to show encryption setup or restore key
+  useEffect(() => {
+    if (isAuthenticated && isLoaded) {
+      // Check if encryption key is already set in session storage
+      const keySet = sessionStorage.getItem("encryptionKeySet");
+      const savedPassphrase = sessionStorage.getItem("encryptionPassphrase");
+
+      if (keySet && savedPassphrase) {
+        // Restore the encryption key from the saved passphrase
+        deriveKey(savedPassphrase)
+          .then((key) => {
+            setEncryptionKey(key);
+            setShowPassphraseSetup(false);
+            loadFiles();
+          })
+          .catch((error) => {
+            console.error("Error restoring encryption key:", error);
+            // If we can't restore the key, show setup again
+            setShowPassphraseSetup(true);
+            sessionStorage.removeItem("encryptionKeySet");
+            sessionStorage.removeItem("encryptionPassphrase");
+          });
+      } else {
+        setShowPassphraseSetup(true);
+      }
+    }
+  }, [isAuthenticated, isLoaded]);
 
   // Load files from IndexedDB
   const loadFiles = async () => {
@@ -82,7 +112,13 @@ export default function AppPage() {
       setEncryptionKey(key);
       setShowPassphraseSetup(false);
       setSuccess("Encryption key set successfully!");
+
+      // Store in session storage for persistence
+      sessionStorage.setItem("encryptionKeySet", "true");
+      sessionStorage.setItem("encryptionPassphrase", passphrase);
+
       setTimeout(() => setSuccess(""), 3000);
+      await loadFiles();
     } catch (err) {
       console.error("Error setting up passphrase:", err);
       setError("Failed to set up encryption");
@@ -103,32 +139,39 @@ export default function AppPage() {
       setError("");
       setSuccess("");
       let uploadedCount = 0;
+      let totalChunksProcessed = 0;
+      let totalChunks = 0;
+
+      // Calculate total chunks across all files
+      for (let i = 0; i < fileList.length; i++) {
+        const chunks = await chunkFile(fileList[i]);
+        totalChunks += chunks.length;
+      }
 
       try {
         for (let i = 0; i < fileList.length; i++) {
           const file = fileList[i];
-          const totalFiles = fileList.length;
+          const fileChunks = await chunkFile(file);
 
-          setUploadProgress(Math.round((i / totalFiles) * 100));
-
-          // Chunk the file
-          const chunks = await chunkFile(file);
-
-          // Save file metadata
+          // Save file metadata with proper MIME type detection
           const fileMetadata = {
             name: file.name,
             size: file.size,
-            mimeType: file.type,
+            mimeType: file.type || "application/octet-stream", // Default to binary if no type
             createdAt: new Date().toISOString(),
-            totalChunks: chunks.length,
+            totalChunks: fileChunks.length,
           };
 
           const fileId = await saveFileMetadata(fileMetadata);
 
           // Encrypt and save each chunk with batch processing to prevent stack overflow
-          for (let chunkIndex = 0; chunkIndex < chunks.length; chunkIndex++) {
+          for (
+            let chunkIndex = 0;
+            chunkIndex < fileChunks.length;
+            chunkIndex++
+          ) {
             const { iv, ciphertext } = await encryptChunk(
-              chunks[chunkIndex],
+              fileChunks[chunkIndex],
               encryptionKey
             );
 
@@ -138,6 +181,12 @@ export default function AppPage() {
               iv,
               ciphertext,
             });
+
+            totalChunksProcessed++;
+            // Update progress based on chunks processed
+            setUploadProgress(
+              Math.round((totalChunksProcessed / totalChunks) * 100)
+            );
 
             // Add a small delay every 10 chunks to prevent blocking the UI
             if (chunkIndex % 10 === 0) {
@@ -216,7 +265,16 @@ export default function AppPage() {
       }
 
       const blob = reconstructFile(decryptedChunks, file.mimeType);
+
+      // Create a more robust URL for the blob
       const url = URL.createObjectURL(blob);
+
+      // For PDFs, we might need to ensure proper handling
+      if (file.mimeType === "application/pdf") {
+        // Add a small delay to ensure blob is ready
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+
       setPreviewFile(file);
       setPreviewUrl(url);
     } catch (err) {
@@ -314,7 +372,10 @@ export default function AppPage() {
   };
 
   // Import backup
-  const handleImportBackup = async (backupFile) => {
+  const handleImportBackup = async (e) => {
+    const backupFile = e.target.files[0];
+    if (!backupFile) return;
+
     setError("");
     setIsLoading(true);
 
@@ -328,6 +389,10 @@ export default function AppPage() {
       setError("Failed to import backup");
     } finally {
       setIsLoading(false);
+      // Reset input
+      if (backupInputRef.current) {
+        backupInputRef.current.value = "";
+      }
     }
   };
 
@@ -349,27 +414,36 @@ export default function AppPage() {
     );
   };
 
-  if (!isClient) return null;
+  // Close preview
+  const closePreview = () => {
+    if (previewUrl) {
+      // Revoke the blob URL to free memory
+      URL.revokeObjectURL(previewUrl);
+    }
+    setPreviewFile(null);
+    setPreviewUrl("");
+  };
 
-  if (!session) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
+  if (!isClient || !isLoaded) return null;
+
+  if (!isAuthenticated) {
+    return null; // Will redirect in useEffect
   }
 
   // Passphrase setup screen
   if (showPassphraseSetup) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">
-            Set Up Encryption
-          </h2>
-          <p className="text-gray-600 mb-6">
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-amber-100 flex items-center justify-center p-4">
+        <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full border border-amber-200">
+          <div className="flex items-center justify-center mb-6">
+            <img
+              src="/src/__create/favicon.png"
+              alt="Veltrain Logo"
+              className="h-20 w-20 mr-3"
+            />
+            <h2 className="text-2xl font-bold text-amber-900">Veltrain</h2>
+          </div>
+          <p className="text-amber-700 mb-6">
             Enter a strong passphrase to encrypt your files
           </p>
 
@@ -377,7 +451,7 @@ export default function AppPage() {
             <div>
               <label
                 htmlFor="passphrase"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-amber-800 mb-2"
               >
                 Encryption Passphrase
               </label>
@@ -387,26 +461,24 @@ export default function AppPage() {
                 value={passphrase}
                 onChange={(e) => setPassphrase(e.target.value)}
                 placeholder="Enter a strong passphrase"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                className="w-full px-4 py-2 border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none"
+                disabled={isLoading}
               />
+              {error && (
+                <div className="mt-2 text-sm text-red-600">{error}</div>
+              )}
             </div>
-
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-red-700 text-sm">
-                {error}
-              </div>
-            )}
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white font-medium py-2 rounded-lg transition"
+              className="w-full bg-amber-500 hover:bg-amber-600 disabled:bg-amber-300 text-amber-900 font-medium py-2 rounded-lg transition"
             >
               {isLoading ? "Setting up..." : "Continue"}
             </button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-gray-200 text-center text-xs text-gray-500">
+          <div className="mt-6 pt-6 border-t border-amber-200 text-center text-xs text-amber-600">
             <p>🔒 Your passphrase is never stored or sent anywhere</p>
           </div>
         </div>
@@ -416,270 +488,352 @@ export default function AppPage() {
 
   // Main app screen
   return (
-    <div
-      className="min-h-screen bg-gray-100"
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
-    >
-      {/* Drag overlay */}
-      <div
-        ref={dragOverlay}
-        className="hidden fixed inset-0 bg-indigo-500 bg-opacity-50 flex items-center justify-center z-50 pointer-events-none"
-      >
-        <div className="text-center text-white">
-          <p className="text-4xl mb-4">📁</p>
-          <p className="text-2xl font-bold">Drop files to upload</p>
-        </div>
-      </div>
-
+    <div className="min-h-screen bg-amber-50">
       {/* Header */}
       <header className="bg-white shadow">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-800">Veltrain</h1>
-            <p className="text-sm text-gray-600">
-              Welcome, {session?.username}!
-            </p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex items-center space-x-3">
+              <img
+                src="/src/__create/favicon.png"
+                alt="Veltrain Logo"
+                className="h-8 w-8"
+              />
+              <h1 className="text-xl font-bold text-amber-700">Veltrain</h1>
+            </div>
+            <div className="flex items-center space-x-4">
+              <span className="text-sm font-medium text-amber-800">
+                Hello, {user?.firstName || user?.email || "User"}!
+              </span>
+              <SignOutButton>
+                <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-amber-900 bg-amber-200 hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500">
+                  Logout
+                </button>
+              </SignOutButton>
+            </div>
           </div>
-          <button
-            onClick={() => {
-              logout();
-              window.location.href = "/login";
-            }}
-            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition"
-          >
-            Logout
-          </button>
         </div>
       </header>
 
-      {/* Main content */}
-      <main className="max-w-6xl mx-auto px-4 py-8">
-        {/* Alert messages */}
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        {/* Alerts */}
         {error && (
-          <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
             {error}
           </div>
         )}
         {success && (
-          <div className="mb-4 bg-green-50 border border-green-200 rounded-lg p-4 text-green-700">
+          <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4 text-green-700">
             {success}
           </div>
         )}
 
-        {/* Upload area */}
-        <div
-          className="bg-white rounded-lg shadow-md p-8 mb-8 border-2 border-dashed border-gray-300 hover:border-indigo-500 transition cursor-pointer"
-          onClick={() => fileInputRef.current?.click()}
-        >
-          <div className="text-center">
-            <p className="text-4xl mb-4">📤</p>
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">
-              Upload Files
+        <div className="mb-8">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-bold text-amber-900">
+              Your Files ({files.length})
             </h2>
-            <p className="text-gray-600 mb-4">
+            <div className="flex space-x-2">
+              <button
+                onClick={handleExportBackup}
+                disabled={isLoading}
+                className="inline-flex items-center px-4 py-2 border border-amber-300 text-sm font-medium rounded-md text-amber-800 bg-amber-100 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50"
+              >
+                Export Backup
+              </button>
+              <label className="inline-flex items-center px-4 py-2 border border-amber-300 text-sm font-medium rounded-md text-amber-800 bg-amber-100 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 cursor-pointer disabled:opacity-50">
+                Import Backup
+                <input
+                  type="file"
+                  ref={backupInputRef}
+                  onChange={handleImportBackup}
+                  accept=".backup,.json"
+                  className="hidden"
+                  disabled={isLoading}
+                />
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* Upload Area */}
+        <div
+          className="mb-8 border-2 border-dashed border-amber-300 rounded-lg p-8 text-center hover:border-amber-500 transition relative bg-white"
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
+          <div className="flex flex-col items-center justify-center">
+            <svg
+              className="mx-auto h-12 w-12 text-amber-500"
+              stroke="currentColor"
+              fill="none"
+              viewBox="0 0 48 48"
+            >
+              <path
+                d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <h3 className="mt-2 text-lg font-medium text-amber-900">
+              Upload Files
+            </h3>
+            <p className="mt-1 text-sm text-amber-700">
               Drag and drop files here or click to select
             </p>
-            <input
-              ref={fileInputRef}
-              type="file"
-              multiple
-              onChange={(e) => handleFileUpload(e.target.files)}
-              className="hidden"
-            />
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                fileInputRef.current?.click();
-              }}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition"
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-amber-900 bg-amber-400 hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
             >
               Choose Files
             </button>
           </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            onChange={(e) => handleFileUpload(e.target.files)}
+            className="hidden"
+          />
+
+          {/* Drag overlay */}
+          <div
+            ref={dragOverlay}
+            className="absolute inset-0 bg-amber-500/10 border-2 border-dashed border-amber-400 rounded-lg flex items-center justify-center hidden"
+          >
+            <div className="text-amber-700 font-medium">Drop files here</div>
+          </div>
 
           {isUploading && (
             <div className="mt-4">
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="flex justify-between text-sm text-amber-700 mb-1">
+                <span>Uploading...</span>
+                <span>{uploadProgress}%</span>
+              </div>
+              <div className="h-2 bg-amber-200 rounded-full overflow-hidden">
                 <div
-                  className="bg-indigo-600 h-2 rounded-full transition-all"
+                  className="h-full bg-amber-500 rounded-full transition-all duration-300"
                   style={{ width: `${uploadProgress}%` }}
                 ></div>
               </div>
-              <p className="text-center text-sm text-gray-600 mt-2">
-                {uploadProgress}%
-              </p>
             </div>
           )}
         </div>
 
-        {/* File list */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-gray-800">
-              Your Files ({files.length})
-            </h2>
-            <div className="flex gap-2">
-              <button
-                onClick={handleExportBackup}
-                disabled={isLoading || files.length === 0}
-                className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg transition text-sm"
-              >
-                Export Backup
-              </button>
-              <button
-                onClick={() => {
-                  const input = document.createElement("input");
-                  input.type = "file";
-                  input.accept = ".backup";
-                  input.onchange = (e) => {
-                    if (e.target.files?.[0]) {
-                      handleImportBackup(e.target.files[0]);
-                    }
-                  };
-                  input.click();
-                }}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition text-sm"
-              >
-                Import Backup
-              </button>
-            </div>
+        {/* Files List */}
+        {files.length > 0 ? (
+          <div className="bg-white shadow overflow-hidden sm:rounded-md border border-amber-200">
+            <ul className="divide-y divide-amber-100">
+              {files.map((file) => (
+                <li key={file.id}>
+                  <div className="px-4 py-4 flex items-center justify-between sm:px-6">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0 h-10 w-10 bg-amber-100 rounded-md flex items-center justify-center">
+                        <svg
+                          className="h-6 w-6 text-amber-600"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                          />
+                        </svg>
+                      </div>
+                      <div className="ml-4">
+                        <div className="text-sm font-medium text-amber-900">
+                          {file.name}
+                        </div>
+                        <div className="flex space-x-4 text-sm text-amber-600">
+                          <span>{formatFileSize(file.size)}</span>
+                          <span>{file.mimeType || "Unknown"}</span>
+                          <span>{formatDate(file.createdAt)}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handlePreview(file)}
+                        disabled={isLoading}
+                        className="inline-flex items-center px-3 py-1 border border-amber-300 text-sm font-medium rounded-md text-amber-700 bg-amber-50 hover:bg-amber-100 disabled:opacity-50"
+                      >
+                        Preview
+                      </button>
+                      <button
+                        onClick={() => handleExportFile(file)}
+                        disabled={isLoading}
+                        className="inline-flex items-center px-3 py-1 border border-amber-300 text-sm font-medium rounded-md text-amber-700 bg-amber-50 hover:bg-amber-100 disabled:opacity-50"
+                      >
+                        Export
+                      </button>
+                      <button
+                        onClick={() => handleDelete(file.id)}
+                        disabled={isLoading}
+                        className="inline-flex items-center px-3 py-1 border border-amber-300 text-sm font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100 disabled:opacity-50"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
-
-          {files.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">
-              <p className="text-lg">No files yet</p>
-              <p className="text-sm">Upload files to get started</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
-                      Name
-                    </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
-                      Size
-                    </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
-                      Type
-                    </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
-                      Uploaded
-                    </th>
-                    <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {files.map((file) => (
-                    <tr
-                      key={file.id}
-                      className="border-b border-gray-200 hover:bg-gray-50"
-                    >
-                      <td className="px-6 py-4 text-sm text-gray-800 font-medium truncate">
-                        {file.name}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {formatFileSize(file.size)}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {file.mimeType || "Unknown"}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {formatDate(file.createdAt)}
-                      </td>
-                      <td className="px-6 py-4 text-right space-x-2">
-                        <button
-                          onClick={() => handlePreview(file)}
-                          disabled={isLoading}
-                          className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-3 py-1 rounded text-xs transition"
-                        >
-                          Preview
-                        </button>
-                        <button
-                          onClick={() => handleExportFile(file)}
-                          disabled={isLoading}
-                          className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-3 py-1 rounded text-xs transition"
-                        >
-                          Export
-                        </button>
-                        <button
-                          onClick={() => handleDelete(file.id)}
-                          disabled={isLoading}
-                          className="bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white px-3 py-1 rounded text-xs transition"
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+        ) : (
+          <div className="text-center py-12 bg-white rounded-lg border border-amber-200">
+            <svg
+              className="mx-auto h-12 w-12 text-amber-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+              />
+            </svg>
+            <h3 className="mt-2 text-sm font-medium text-amber-900">
+              No files
+            </h3>
+            <p className="mt-1 text-sm text-amber-700">
+              Get started by uploading a new file.
+            </p>
+          </div>
+        )}
       </main>
 
-      {/* Preview modal */}
-      {previewFile && previewUrl && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
-          onClick={() => {
-            setPreviewFile(null);
-            setPreviewUrl("");
-          }}
-        >
-          <div
-            className="bg-white rounded-lg max-w-4xl w-full max-h-[80vh] overflow-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-gray-800">
-                  {previewFile.name}
-                </h3>
-                <button
-                  onClick={() => {
-                    setPreviewFile(null);
-                    setPreviewUrl("");
-                  }}
-                  className="text-gray-500 hover:text-gray-700 text-2xl"
+      {/* Preview Modal */}
+      {previewFile && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col border border-amber-300">
+            <div className="px-4 py-3 border-b border-amber-200 flex justify-between items-center bg-amber-50">
+              <h3 className="text-lg font-medium text-amber-900">
+                Preview: {previewFile.name}
+              </h3>
+              <button
+                onClick={closePreview}
+                className="text-amber-600 hover:text-amber-800"
+              >
+                <svg
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
                 >
-                  ×
-                </button>
-              </div>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
 
-              {previewFile.mimeType?.startsWith("image/") ? (
-                <img
-                  src={previewUrl}
-                  alt={previewFile.name}
-                  className="w-full"
-                />
-              ) : previewFile.mimeType?.startsWith("text/") ? (
-                <iframe
-                  src={previewUrl}
-                  className="w-full h-96 border border-gray-200 rounded"
-                  title={previewFile.name}
-                />
-              ) : previewFile.mimeType === "application/pdf" ? (
-                <iframe
-                  src={previewUrl}
-                  className="w-full h-96 border border-gray-200 rounded"
-                  title={previewFile.name}
-                />
+            <div className="flex-1 overflow-auto p-4">
+              {isLoading ? (
+                <div className="flex items-center justify-center h-64">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
+                </div>
               ) : (
-                <div className="p-4 bg-gray-100 rounded text-center text-gray-600">
-                  <p>Preview not available for this file type</p>
-                  <button
-                    onClick={() => handleExportFile(previewFile)}
-                    className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
-                  >
-                    Download to view
-                  </button>
+                <div className="h-full flex flex-col">
+                  {previewFile.mimeType?.startsWith("text/") ||
+                  previewFile.mimeType === "application/json" ? (
+                    <iframe
+                      src={previewUrl}
+                      className="flex-1 w-full border rounded border-amber-200"
+                      title={`Preview of ${previewFile.name}`}
+                      onError={(e) => {
+                        console.error("Preview failed for text file:", e);
+                        // Fallback to download if preview fails
+                        e.target.style.display = "none";
+                      }}
+                    />
+                  ) : previewFile.mimeType === "application/pdf" ? (
+                    <embed
+                      src={previewUrl}
+                      type="application/pdf"
+                      className="flex-1 w-full"
+                      onError={(e) => {
+                        console.error("Preview failed for PDF:", e);
+                        // Fallback to download if preview fails
+                        e.target.style.display = "none";
+                      }}
+                    />
+                  ) : previewFile.mimeType?.startsWith("image/") ? (
+                    <img
+                      src={previewUrl}
+                      alt={`Preview of ${previewFile.name}`}
+                      className="max-w-full max-h-full mx-auto"
+                      onError={(e) => {
+                        console.error("Preview failed for image:", e);
+                        // Fallback to download if preview fails
+                        e.target.style.display = "none";
+                      }}
+                    />
+                  ) : previewFile.mimeType?.startsWith("video/") ? (
+                    <video
+                      src={previewUrl}
+                      controls
+                      className="max-w-full max-h-full mx-auto"
+                      onError={(e) => {
+                        console.error("Preview failed for video:", e);
+                        // Fallback to download if preview fails
+                        e.target.style.display = "none";
+                      }}
+                    />
+                  ) : previewFile.mimeType?.startsWith("audio/") ? (
+                    <audio
+                      src={previewUrl}
+                      controls
+                      className="w-full mt-8"
+                      onError={(e) => {
+                        console.error("Preview failed for audio:", e);
+                        // Fallback to download if preview fails
+                        e.target.style.display = "none";
+                      }}
+                    />
+                  ) : (
+                    <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
+                      <svg
+                        className="mx-auto h-12 w-12 text-amber-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        />
+                      </svg>
+                      <h3 className="mt-2 text-lg font-medium text-amber-900">
+                        Preview not available
+                      </h3>
+                      <p className="mt-1 text-sm text-amber-700">
+                        This file type cannot be previewed directly.
+                      </p>
+                      <div className="mt-6">
+                        <a
+                          href={previewUrl}
+                          download={previewFile.name}
+                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-amber-900 bg-amber-400 hover:bg-amber-500"
+                        >
+                          Download File
+                        </a>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

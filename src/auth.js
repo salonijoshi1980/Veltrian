@@ -1,29 +1,11 @@
-/**
- * WARNING: This file connects this app to Create's internal auth system. Do
- * not attempt to edit it. Do not import @auth/create or @auth/create
- * anywhere else or it may break. This is an internal package.
- */
-import CreateAuth from '@auth/create';
-import Credentials from '@auth/core/providers/credentials';
+import { ClerkProvider, useAuth as useClerkAuth } from "@clerk/clerk-react";
 
-const result = CreateAuth({
-	providers: [
-		Credentials({
-			credentials: {
-				email: {
-					label: 'Email',
-					type: 'email',
-				},
-				password: {
-					label: 'Password',
-					type: 'password',
-				},
-			},
-		}),
-	],
-	pages: {
-		signIn: '/account/signin',
-		signOut: '/account/logout',
-	},
-});
-export const { auth } = result;
+// Make sure to add your publishable key to your .env.local file
+const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || import.meta.env.CLERK_PUBLISHABLE_KEY;
+
+// Only throw error in client context, in SSR we'll handle it gracefully
+if (typeof window !== 'undefined' && !publishableKey) {
+  throw new Error("Missing Clerk Publishable Key. Please add VITE_CLERK_PUBLISHABLE_KEY to your .env file");
+}
+
+export { ClerkProvider, useClerkAuth };
