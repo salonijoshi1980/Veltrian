@@ -1,7 +1,5 @@
-"use client";
-
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { SignIn } from "@clerk/clerk-react";
 import { useAuth } from "@/utils/clerkAuth";
 
@@ -15,7 +13,7 @@ export default function LoginPage() {
 
     // Redirect authenticated users to the app
     if (isAuthenticated) {
-      navigate("/app");
+      navigate("/app", { replace: true });
     }
   }, [isAuthenticated, navigate]);
 
@@ -30,7 +28,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Veltrain</h1>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">Veltrian</h1>
           <p className="text-gray-600">Cloudless File Manager</p>
         </div>
 
@@ -43,7 +41,7 @@ export default function LoginPage() {
                 headerSubtitle: "hidden",
               },
             }}
-            redirectUrl="/app"
+            redirectUrl={import.meta.env.VITE_CLERK_AFTER_SIGN_IN_URL || "/app"}
           />
         </div>
 

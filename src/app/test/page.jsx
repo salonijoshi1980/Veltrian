@@ -1,7 +1,5 @@
-"use client";
-
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/utils/clerkAuth";
 import { deriveKey } from "@/utils/crypto";
 
@@ -17,7 +15,7 @@ export default function TestPage() {
 
     // Redirect unauthenticated users to login
     if (isLoaded && !isAuthenticated) {
-      navigate("/login");
+      navigate("/login", { replace: true });
     }
   }, [isLoaded, isAuthenticated, navigate]);
 
@@ -28,18 +26,11 @@ export default function TestPage() {
         try {
           // Check if encryption key is already set in session storage
           const keySet = sessionStorage.getItem("encryptionKeySet");
-          const savedPassphrase = sessionStorage.getItem(
-            "encryptionPassphrase"
-          );
-
-          if (keySet && savedPassphrase) {
+          if (keySet) {
             setTestResult(
-              "Found encryption key in sessionStorage. Attempting to restore..."
+              "Key marker present. Prompt user for passphrase to derive key (do not load from storage)."
             );
-
-            // Try to restore the encryption key from the saved passphrase
-            const key = await deriveKey(savedPassphrase);
-            setTestResult("SUCCESS: Encryption key restored successfully!");
+            // e.g., open a modal to collect passphrase and call deriveKey(pass)
           } else {
             setTestResult(
               "No encryption key found in sessionStorage. Need to set up encryption."
@@ -91,16 +82,13 @@ export default function TestPage() {
               encryptionKeySet:{" "}
               {sessionStorage.getItem("encryptionKeySet") || "null"}
             </p>
-            <p className="mt-1 text-gray-900">
-              encryptionPassphrase:{" "}
-              {sessionStorage.getItem("encryptionPassphrase") || "null"}
-            </p>
+            {/* Do not render passphrases or keys. */}
           </div>
 
           <button
             onClick={() => {
               sessionStorage.removeItem("encryptionKeySet");
-              sessionStorage.removeItem("encryptionPassphrase");
+              // Do not ever persist passphrases; nothing to remove.
               window.location.reload();
             }}
             className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 rounded-lg transition"

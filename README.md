@@ -52,6 +52,10 @@ A modern web application built with React, Vite, and React Router.
 
 5. Update the `.env` file with your environment variables, particularly:
    - `VITE_CLERK_PUBLISHABLE_KEY` - Your Clerk publishable key
+   - `VITE_CLERK_SIGN_IN_URL` - Path to the sign-in page (e.g., /login)
+   - `VITE_CLERK_SIGN_UP_URL` - Path to the sign-up page (e.g., /signup)
+   - `VITE_CLERK_AFTER_SIGN_IN_URL` - Post sign-in redirect (e.g., /app)
+   - `VITE_CLERK_AFTER_SIGN_UP_URL` - Post sign-up redirect (e.g., /app)
 
 ### Development
 
