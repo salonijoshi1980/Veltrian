@@ -438,8 +438,34 @@ export default function App() {
     return <Outlet />;
   }
 
+  // Configure ClerkProvider with routing options for modal behavior
+  const clerkOptions = {
+    routing: "virtual", // This enables modal behavior
+    signInUrl: "/login",
+    signUpUrl: "/signup",
+    afterSignInUrl: "/app",
+    afterSignUpUrl: "/app",
+  };
+
   return (
-    <ClerkProvider publishableKey={publishableKey}>
+    <ClerkProvider
+      publishableKey={publishableKey}
+      {...clerkOptions}
+      routerPush={(to) => {
+        console.log("Clerk routerPush called with:", to);
+        // Prevent routing for virtual routing mode
+        if (clerkOptions.routing !== "virtual") {
+          window.location.href = to;
+        }
+      }}
+      routerReplace={(to) => {
+        console.log("Clerk routerReplace called with:", to);
+        // Prevent routing for virtual routing mode
+        if (clerkOptions.routing !== "virtual") {
+          window.location.replace(to);
+        }
+      }}
+    >
       <AppWithClerk />
     </ClerkProvider>
   );
