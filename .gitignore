@@ -1,0 +1,85 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+.nyc_output
+
+# Testing
+/coverage
+
+# Production
+/build
+/dist
+
+# Environment files
+.env*
+!.env.example
+
+# IDE and editor files
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# React Router
+/.react-router/
+
+# TypeScript
+*.tsbuildinfo
+*.tsx.cache
+
+# Vite
+.vite
+.vite-inspect
+
+# Cypress
+/cypress/screenshots/
+/cypress/videos/
+
+# Package manager (commit exactly one lockfile; ignore the rest if you standardize)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+# bun.lock
+
+# Build outputs
+/out-tsc
+/.next/
+/.nuxt/
+/out/
+
+# Miscellaneous
+*.tgz
+*.zip
+*.7z
