@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useAuth, useUser } from "@/utils/clerkAuth";
-import { SignOutButton } from "@clerk/clerk-react";
+import { SignOutButton, SignInButton } from "@clerk/clerk-react";
 
 export default function Header() {
   const { isAuthenticated } = useAuth();
@@ -34,12 +34,11 @@ export default function Header() {
             </div>
           ) : (
             <div className="flex items-center space-x-4">
-              <Link
-                to="/login"
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-amber-900 bg-amber-200 hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
-              >
-                Login
-              </Link>
+              <SignInButton mode="modal">
+                <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-amber-900 bg-amber-200 hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500">
+                  Login
+                </button>
+              </SignInButton>
             </div>
           )}
         </div>

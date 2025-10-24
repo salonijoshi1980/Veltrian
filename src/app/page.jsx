@@ -92,7 +92,7 @@ export default function HomePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4 mb-16">
-            <SignInButton mode="modal" forceRedirectUrl={false}>
+            <SignInButton mode="modal">
               <button className="px-8 py-3 bg-amber-500 hover:bg-amber-600 text-amber-900 font-medium rounded-lg transition shadow-md hover:shadow-lg">
                 Get Started
               </button>

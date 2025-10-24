@@ -451,8 +451,20 @@ export default function App() {
     <ClerkProvider
       publishableKey={publishableKey}
       {...clerkOptions}
-      routerPush={() => {}} // Prevent routing
-      routerReplace={() => {}} // Prevent routing
+      routerPush={(to) => {
+        console.log("Clerk routerPush called with:", to);
+        // Prevent routing for virtual routing mode
+        if (clerkOptions.routing !== "virtual") {
+          window.location.href = to;
+        }
+      }}
+      routerReplace={(to) => {
+        console.log("Clerk routerReplace called with:", to);
+        // Prevent routing for virtual routing mode
+        if (clerkOptions.routing !== "virtual") {
+          window.location.replace(to);
+        }
+      }}
     >
       <AppWithClerk />
     </ClerkProvider>
