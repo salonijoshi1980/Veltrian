@@ -1,22 +1,7 @@
-import fg from 'fast-glob';
-import type { Route } from './+types/not-found';
-import { useNavigate } from 'react-router';
-import { useCallback, useEffect, useState } from 'react';
-
-export async function loader({ params }: Route.LoaderArgs) {
-  const matches = await fg('src/**/page.{js,jsx,ts,tsx}');
-  return {
-    path: `/${params['*']}`,
-    pages: matches
-      .sort((a, b) => a.length - b.length)
-      .map((match) => {
-        const url = match.replace('src/app', '').replace(/\/page\.(js|jsx|ts|tsx)$/, '') || '/';
-        const path = url.replaceAll('[', '').replaceAll(']', '');
-        const displayPath = path === '/' ? 'Homepage' : path;
-        return { url, path: displayPath };
-      }),
-  };
-}
+import fg from "fast-glob";
+import type { Route } from "./+types/not-found";
+import { useNavigate } from "react-router";
+import { useCallback, useEffect, useState } from "react";
 
 interface ParentSitemap {
   webPages?: Array<{
@@ -27,44 +12,39 @@ interface ParentSitemap {
   }>;
 }
 
-export default function CreateDefaultNotFoundPage({
-  loaderData,
-}: {
-  loaderData: Awaited<ReturnType<typeof loader>>;
-}) {
+export default function CreateDefaultNotFoundPage() {
   const [siteMap, setSitemap] = useState<ParentSitemap | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.parent && window.parent !== window) {
+    if (
+      typeof window !== "undefined" &&
+      window.parent &&
+      window.parent !== window
+    ) {
       const handler = (event: MessageEvent) => {
-        if (event.data.type === 'sandbox:sitemap') {
-          window.removeEventListener('message', handler);
+        if (event.data.type === "sandbox:sitemap") {
+          window.removeEventListener("message", handler);
           setSitemap(event.data.sitemap);
         }
       };
 
       window.parent.postMessage(
         {
-          type: 'sandbox:sitemap',
+          type: "sandbox:sitemap",
         },
-        '*'
+        "*"
       );
-      window.addEventListener('message', handler);
+      window.addEventListener("message", handler);
 
       return () => {
-        window.removeEventListener('message', handler);
+        window.removeEventListener("message", handler);
       };
     }
   }, []);
-  const missingPath = loaderData.path.replace(/^\//, '');
-  const existingRoutes = loaderData.pages.map((page) => ({
-    path: page.path,
-    url: page.url,
-  }));
 
   const handleBack = () => {
-    navigate('/');
+    navigate("/");
   };
 
   const handleSearch = (value: string) => {
@@ -77,15 +57,17 @@ export default function CreateDefaultNotFoundPage({
   };
 
   const handleCreatePage = useCallback(() => {
+    // We don't have the missingPath parameter anymore, so we'll need to get it from the URL
+    const path = window.location.pathname.replace(/^\//, "");
     window.parent.postMessage(
       {
-        type: 'sandbox:web:create',
-        path: missingPath,
-        view: 'web',
+        type: "sandbox:web:create",
+        path: path,
+        view: "web",
       },
-      '*'
+      "*"
     );
-  }, [missingPath]);
+  }, []);
 
   return (
     <div className="flex sm:w-full w-screen sm:min-w-[850px] flex-col">
@@ -128,9 +110,9 @@ export default function CreateDefaultNotFoundPage({
             <p
               className="border-0 bg-transparent px-3 py-2 focus:outline-none truncate max-w-[300px]"
               style={{ minWidth: 0 }}
-              title={missingPath}
+              title={window.location.pathname.replace(/^\//, "")}
             >
-              {missingPath}
+              {window.location.pathname.replace(/^\//, "")}
             </p>
           </div>
         </div>
@@ -142,16 +124,22 @@ export default function CreateDefaultNotFoundPage({
         </h1>
 
         <p className="pt-4 pb-12 px-2 text-gray-500">
-          Looks like "<span className="font-bold">/{missingPath}</span>" isn't part of your project.
-          But no worries, you've got options!
+          Looks like "
+          <span className="font-bold">
+            /{window.location.pathname.replace(/^\//, "")}
+          </span>
+          " isn't part of your project. But no worries, you've got options!
         </p>
 
         <div className="px-[20px] w-full">
           <div className="flex flex-row justify-center items-center w-full max-w-[800px] mx-auto border border-gray-200 rounded-lg p-[20px] mb-[40px] gap-[20px]">
             <div className="flex flex-col gap-[5px] items-start self-start w-1/2">
-              <p className="text-sm text-black text-left">Build it from scratch</p>
+              <p className="text-sm text-black text-left">
+                Build it from scratch
+              </p>
               <p className="text-sm text-gray-500 text-left">
-                Create a new page to live at "<span>/{missingPath}</span>"
+                Create a new page to live at "
+                <span>/{window.location.pathname.replace(/^\//, "")}</span>"
               </p>
             </div>
             <div className="flex flex-row items-center justify-end w-1/2">
@@ -175,11 +163,13 @@ export default function CreateDefaultNotFoundPage({
         {siteMap ? (
           <div className="flex flex-col justify-center items-center w-full px-[50px]">
             <div className="flex flex-col justify-between items-center w-full max-w-[600px] gap-[10px]">
-              <p className="text-sm text-gray-300 pb-[10px] self-start p-4">PAGES</p>
+              <p className="text-sm text-gray-300 pb-[10px] self-start p-4">
+                PAGES
+              </p>
               {siteMap.webPages?.map((route) => (
                 <button
                   type="button"
-                  onClick={() => handleSearch(route.cleanRoute || '')}
+                  onClick={() => handleSearch(route.cleanRoute || "")}
                   key={route.id}
                   className="flex flex-row justify-between text-center items-center p-4 rounded-lg bg-white shadow-sm w-full hover:bg-gray-50"
                 >
@@ -191,23 +181,10 @@ export default function CreateDefaultNotFoundPage({
           </div>
         ) : (
           <div className="flex flex-wrap gap-3 w-full max-w-[80rem] mx-auto pb-5 px-2">
-            {existingRoutes.map((route) => (
-              <div
-                key={route.path}
-                className="flex flex-col flex-grow basis-full sm:basis-[calc(50%-0.375rem)] xl:basis-[calc(33.333%-0.5rem)]"
-              >
-                <div className="w-full flex-1 flex flex-col items-center ">
-                  <div className="relative w-full max-w-[350px] h-48 sm:h-56 lg:h-64 overflow-hidden rounded-[8px] border border-comeback-gray-75 transition-all group-hover:shadow-md">
-                    <button
-                      type="button"
-                      onClick={() => handleSearch(route.url.replace(/^\//, ''))}
-                      className="h-full w-full rounded-[8px] bg-gray-50 bg-cover"
-                    />
-                  </div>
-                  <p className="pt-3 text-left text-gray-500 w-full max-w-[350px]">{route.path}</p>
-                </div>
-              </div>
-            ))}
+            {/* Since we removed the loader, we can't show existing routes anymore */}
+            <p className="text-gray-500">
+              No route information available in SPA mode.
+            </p>
           </div>
         )}
       </div>
