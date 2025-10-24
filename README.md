@@ -93,23 +93,35 @@ npm run typecheck
 src/
 ├── app/                  # App router structure (editable)
 │   ├── api/              # API routes (editable)
+│   ├── app/              # Main application page
+│   │   └── page.jsx      # Main app component
+│   ├── components/       # Reusable UI components
+│   │   ├── FileManager/  # File management components
+│   │   │   ├── FileList.jsx
+│   │   │   ├── UploadArea.jsx
+│   │   │   ├── PreviewModal.jsx
+│   │   │   ├── PassphraseSetupModal.jsx
+│   │   │   └── index.js
+│   │   ├── Header.jsx    # Global header component
+│   │   └── README.md     # Component documentation
+│   ├── hooks/            # Custom React hooks
+│   │   ├── useFileOperations.js
+│   │   ├── useFormatting.js
+│   │   ├── index.js
+│   │   └── README.md     # Hooks documentation
 │   ├── login/            # Login page (editable)
-│   ├── test/             # Test page (editable)
-│   ├── test-auth/        # Test auth page (editable)
 │   ├── __create/         # Auto-generated files (do not edit)
 │   ├── layout.jsx        # Root layout (editable)
 │   ├── page.jsx          # Root page (editable)
 │   ├── root.tsx          # Root component (editable)
 │   └── routes.ts         # Route configuration (editable)
 ├── utils/                # Utility functions (editable)
-├── client-integrations/  # Third-party UI integrations (editable)
 ├── __create/             # Auto-generated templates (do not edit)
 └── ...                   # Other auto-generated files (do not edit)
 
 # Editable files:
 # - src/app/ (except __create subdirectory)
 # - src/utils/
-# - src/client-integrations/
 
 # Auto-generated files (do not edit):
 # - src/app/__create/

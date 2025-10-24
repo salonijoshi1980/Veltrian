@@ -56,14 +56,32 @@ function optimizeChunksForBackup(chunks) {
         return chunk; // Already optimized
       }
 
+      // Convert arrays to base64 strings
+      let ivBase64 = chunk.iv;
+      let cipherBase64 = chunk.ciphertext;
+
+      if (Array.isArray(chunk.iv)) {
+        // Convert array to binary string then to base64
+        let binary = "";
+        for (let i = 0; i < chunk.iv.length; i++) {
+          binary += String.fromCharCode(chunk.iv[i]);
+        }
+        ivBase64 = btoa(binary);
+      }
+
+      if (Array.isArray(chunk.ciphertext)) {
+        // Convert array to binary string then to base64
+        let binary = "";
+        for (let i = 0; i < chunk.ciphertext.length; i++) {
+          binary += String.fromCharCode(chunk.ciphertext[i]);
+        }
+        cipherBase64 = btoa(binary);
+      }
+
       return {
         ...chunk,
-        iv: Array.isArray(chunk.iv)
-          ? toBase64(new Uint8Array(chunk.iv))
-          : chunk.iv,
-        ciphertext: Array.isArray(chunk.ciphertext)
-          ? toBase64(new Uint8Array(chunk.ciphertext))
-          : chunk.ciphertext,
+        iv: ivBase64,
+        ciphertext: cipherBase64,
       };
     });
   } catch (error) {
@@ -85,16 +103,36 @@ function restoreChunksFromBackup(chunks) {
         return chunk; // Already restored
       }
 
+      // Convert base64 strings to arrays
+      let ivArray = chunk.iv;
+      let cipherArray = chunk.ciphertext;
+
+      if (typeof chunk.iv === "string") {
+        // Convert base64 string to binary string then to array
+        const binaryString = atob(chunk.iv);
+        const len = binaryString.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        ivArray = Array.from(bytes);
+      }
+
+      if (typeof chunk.ciphertext === "string") {
+        // Convert base64 string to binary string then to array
+        const binaryString = atob(chunk.ciphertext);
+        const len = binaryString.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        cipherArray = Array.from(bytes);
+      }
+
       return {
         ...chunk,
-        iv:
-          typeof chunk.iv === "string"
-            ? Array.from(fromBase64(chunk.iv))
-            : chunk.iv,
-        ciphertext:
-          typeof chunk.ciphertext === "string"
-            ? Array.from(fromBase64(chunk.ciphertext))
-            : chunk.ciphertext,
+        iv: ivArray,
+        ciphertext: cipherArray,
       };
     });
   } catch (error) {

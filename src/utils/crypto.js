@@ -79,8 +79,8 @@ export async function encryptChunk(chunk, key) {
     const cipherBase64 = btoa(binary);
 
     return {
-      iv: ivBase64,
-      ciphertext: cipherBase64,
+      iv: ivBase64, // Always return as base64 string
+      ciphertext: cipherBase64, // Always return as base64 string
     };
   } catch (error) {
     console.error("Error encrypting chunk:", error);
@@ -90,22 +90,46 @@ export async function encryptChunk(chunk, key) {
 
 /**
  * Decrypt a chunk of data
- * @param {string} iv - The initialization vector (base64)
- * @param {string} ciphertext - The encrypted data (base64)
+ * @param {string|Array} iv - The initialization vector (base64 string or array)
+ * @param {string|Array} ciphertext - The encrypted data (base64 string or array)
  * @param {CryptoKey} key - The decryption key
  * @returns {Promise<Uint8Array>} - The decrypted data
  */
 export async function decryptChunk(iv, ciphertext, key) {
   try {
+    // Handle case where iv and ciphertext might be arrays (after backup import)
+    // or already base64 strings (normal operation)
+    let ivBase64 = iv;
+    let cipherBase64 = ciphertext;
+
+    // If they are arrays, convert to base64 strings first
+    if (Array.isArray(iv)) {
+      // Convert array to binary string
+      let binary = "";
+      for (let i = 0; i < iv.length; i++) {
+        binary += String.fromCharCode(iv[i]);
+      }
+      ivBase64 = btoa(binary);
+    }
+
+    if (Array.isArray(ciphertext)) {
+      // Convert array to binary string
+      let binary = "";
+      for (let i = 0; i < ciphertext.length; i++) {
+        binary += String.fromCharCode(ciphertext[i]);
+      }
+      cipherBase64 = btoa(binary);
+    }
+
     // Convert base64 back to binary data using a stack-safe approach
-    const ivBinaryString = atob(iv);
+    const ivBinaryString = atob(ivBase64);
     const ivLen = ivBinaryString.length;
     const ivBytes = new Uint8Array(ivLen);
     for (let i = 0; i < ivLen; i++) {
       ivBytes[i] = ivBinaryString.charCodeAt(i);
     }
 
-    const cipherBinaryString = atob(ciphertext);
+    const cipherBinaryString = atob(cipherBase64);
     const cipherLen = cipherBinaryString.length;
     const cipherBytes = new Uint8Array(cipherLen);
     for (let i = 0; i < cipherLen; i++) {

@@ -438,8 +438,22 @@ export default function App() {
     return <Outlet />;
   }
 
+  // Configure ClerkProvider with routing options for modal behavior
+  const clerkOptions = {
+    routing: "virtual", // This enables modal behavior
+    signInUrl: "/login",
+    signUpUrl: "/signup",
+    afterSignInUrl: "/app",
+    afterSignUpUrl: "/app",
+  };
+
   return (
-    <ClerkProvider publishableKey={publishableKey}>
+    <ClerkProvider
+      publishableKey={publishableKey}
+      {...clerkOptions}
+      routerPush={() => {}} // Prevent routing
+      routerReplace={() => {}} // Prevent routing
+    >
       <AppWithClerk />
     </ClerkProvider>
   );
