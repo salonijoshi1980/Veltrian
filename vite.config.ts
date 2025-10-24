@@ -9,7 +9,6 @@ import { aliases } from "./plugins/aliases";
 import consoleToParent from "./plugins/console-to-parent";
 import { layoutWrapperPlugin } from "./plugins/layouts";
 import { loadFontsFromTailwindSource } from "./plugins/loadFontsFromTailwindSource";
-import { nextPublicProcessEnv } from "./plugins/nextPublicProcessEnv";
 import { restart } from "./plugins/restart";
 import { restartEnvFileChange } from "./plugins/restartEnvFileChange";
 import { viteEnvPlugin } from "./plugins/viteEnvPlugin";
@@ -33,13 +32,8 @@ export default defineConfig({
   },
   logLevel: "info",
   plugins: [
-    nextPublicProcessEnv(),
     viteEnvPlugin(),
     restartEnvFileChange(),
-    reactRouterHonoServer({
-      serverEntryPoint: "./__create/index.ts",
-      runtime: "node",
-    }),
     babel({
       include: ["src/**/*.{js,jsx,ts,tsx}"], // or RegExp: /src\/.*\.[tj]sx?$/
       exclude: /node_modules/, // skip everything else

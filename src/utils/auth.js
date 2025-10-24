@@ -1,8 +1,5 @@
-// Auth utilities for Clerk integration
-// Previous fake auth implementation has been removed
-
-export {};
-// Fake authentication utilities
+// Legacy fake auth utilities (dev/test only). Clerk is the primary auth provider.
+// TODO: Remove after full migration to Clerk authentication.
 
 const SESSION_KEY = "veltrain_session";
 const isBrowser =
@@ -14,6 +11,9 @@ const isBrowser =
  * @param {string} password - Password (not validated)
  * @returns {boolean} - Always true for fake login
  */
+// Legacy fake auth utilities (dev/test only). Clerk is the primary auth provider.
+// TODO: Remove after full migration to Clerk authentication.
+
 export function fakeLogin(username, password) {
   if (!username || !password) return false;
   if (!isBrowser) return false;

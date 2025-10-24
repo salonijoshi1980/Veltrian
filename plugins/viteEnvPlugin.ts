@@ -9,29 +9,31 @@ import { type Plugin, loadEnv } from "vite";
  */
 export function viteEnvPlugin(): Plugin {
   let stub = "";
-  function makeStub(v: Record<string, string>, p: Record<string, string>) {
-    return `
-if (typeof window !== 'undefined') {
-  const $vite = ${JSON.stringify(v)};
-  const $public = ${JSON.stringify(p)};
-  globalThis.process ??= {};
-  const base = globalThis.process.env ?? {};
-  const $runtime = { NODE_ENV: ${JSON.stringify(process.env.NODE_ENV ?? "development")}, MODE: ${JSON.stringify(process.env.NODE_ENV ?? "development")} };
-  globalThis.process.env = new Proxy(Object.assign({}, $runtime, $vite, $public, base), {
-    get(t: Record<string, string>, q: string) { return q in t ? t[q] : undefined; },
-    has(t: Record<string, string>, q: string) { return q in t; }
-  });
-}
-`;
-  }
 
   return {
     name: "vite:vite-env-plugin",
     enforce: "post",
     configResolved(config) {
-      const v = loadEnv(config.mode, config.root, "VITE_");
-      const p = loadEnv(config.mode, config.root, "NEXT_PUBLIC_");
-      stub = makeStub(v, p);
+      const viteEnv = loadEnv(config.mode, config.root, "VITE_");
+      const nextPublicEnv = loadEnv(config.mode, config.root, "NEXT_PUBLIC_");
+
+      // Handle potentially undefined values
+      const nodeEnv = process.env.NODE_ENV || "development";
+      const mode = config.mode || "development";
+
+      stub = `
+if (typeof window !== 'undefined') {
+  const $vite = ${JSON.stringify(viteEnv)};
+  const $public = ${JSON.stringify(nextPublicEnv)};
+  globalThis.process ??= {};
+  const base = globalThis.process.env ?? {};
+  const $runtime = { NODE_ENV: "${nodeEnv}", MODE: "${mode}" };
+  globalThis.process.env = new Proxy(Object.assign({}, $runtime, $vite, $public, base), {
+    get(t, p) { return p in t ? t[p] : undefined; },
+    has(t, p) { return p in t; }
+  });
+}
+`;
     },
     /** Inject the stub at the top of every JS/TS module compiled for the browser. */
     transform(code, id, opts) {

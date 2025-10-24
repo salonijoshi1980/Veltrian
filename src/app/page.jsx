@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/utils/clerkAuth";
 
 export default function HomePage() {
@@ -9,9 +9,9 @@ export default function HomePage() {
   useEffect(() => {
     if (isLoaded) {
       if (isAuthenticated) {
-        navigate("/app");
+        navigate("/app", { replace: true });
       } else {
-        navigate("/login");
+        navigate("/login", { replace: true });
       }
     }
   }, [isLoaded, isAuthenticated, navigate]);

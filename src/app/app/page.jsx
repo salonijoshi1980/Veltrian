@@ -59,28 +59,8 @@ export default function AppPage() {
   // Check if we need to show encryption setup or restore key
   useEffect(() => {
     if (isAuthenticated && isLoaded) {
-      // Check if encryption key is already set in session storage
-      const keySet = sessionStorage.getItem("encryptionKeySet");
-      const savedPassphrase = sessionStorage.getItem("encryptionPassphrase");
-
-      if (keySet && savedPassphrase) {
-        // Restore the encryption key from the saved passphrase
-        deriveKey(savedPassphrase)
-          .then((key) => {
-            setEncryptionKey(key);
-            setShowPassphraseSetup(false);
-            loadFiles();
-          })
-          .catch((error) => {
-            console.error("Error restoring encryption key:", error);
-            // If we can't restore the key, show setup again
-            setShowPassphraseSetup(true);
-            sessionStorage.removeItem("encryptionKeySet");
-            sessionStorage.removeItem("encryptionPassphrase");
-          });
-      } else {
-        setShowPassphraseSetup(true);
-      }
+      // Never restore from storage; require user input each session
+      setShowPassphraseSetup(true);
     }
   }, [isAuthenticated, isLoaded]);
 
@@ -113,9 +93,8 @@ export default function AppPage() {
       setShowPassphraseSetup(false);
       setSuccess("Encryption key set successfully!");
 
-      // Store in session storage for persistence
+      // Do not persist passphrase; keep key only in memory
       sessionStorage.setItem("encryptionKeySet", "true");
-      sessionStorage.setItem("encryptionPassphrase", passphrase);
 
       setTimeout(() => setSuccess(""), 3000);
       await loadFiles();
@@ -266,6 +245,8 @@ export default function AppPage() {
 
       const blob = reconstructFile(decryptedChunks, file.mimeType);
 
+      // Revoke previous preview URL before setting a new one
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
       // Create a more robust URL for the blob
       const url = URL.createObjectURL(blob);
 
