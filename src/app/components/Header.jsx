@@ -26,7 +26,7 @@ export default function Header() {
               <span className="text-sm font-medium text-amber-800">
                 Hello, {user?.firstName || user?.email || "User"}!
               </span>
-              <SignOutButton>
+              <SignOutButton redirectUrl="/">
                 <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-amber-900 bg-amber-200 hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500">
                   Logout
                 </button>

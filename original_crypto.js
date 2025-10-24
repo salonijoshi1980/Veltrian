@@ -26,39 +26,16 @@ export async function deriveKey(passphrase) {
       ["deriveBits", "deriveKey"]
     );
 
-    // Per-user persistent salt (16 bytes), stored locally
-    const salt = await (async () => {
-      const key = "veltrain_kdf_salt_b64";
-      let b64 = null;
-      try {
-        b64 = localStorage.getItem(key);
-      } catch {}
-      if (!b64) {
-        const s = new Uint8Array(16);
-        crypto.getRandomValues(s);
-        let bin = "";
-        for (let i = 0; i < s.length; i++) bin += String.fromCharCode(s[i]);
-        b64 = btoa(bin);
-        try {
-          localStorage.setItem(key, b64);
-        } catch {}
-      }
-      const bin = atob(b64);
-      const bytes = new Uint8Array(bin.length);
-      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-      return bytes;
-    })();
-
     const key = await window.crypto.subtle.deriveKey(
       {
         name: "PBKDF2",
-        salt: salt, // Per-user persistent salt
+        salt: encoder.encode("veltrain-salt"), // Static salt for consistency
         iterations: 100000,
         hash: "SHA-256",
       },
       importedKey,
       ALGORITHM,
-      false, // Make derived key non-extractable to reduce key exfiltration risk
+      true,
       ["encrypt", "decrypt"]
     );
 
