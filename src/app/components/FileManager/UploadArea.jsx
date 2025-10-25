@@ -1,6 +1,4 @@
 import { useRef } from "react";
-import { useAuth } from "@/utils/clerkAuth";
-import { SignInButton } from "@clerk/clerk-react";
 
 export default function UploadArea({
   onFileUpload,
@@ -12,32 +10,9 @@ export default function UploadArea({
   fileInputRef,
 }) {
   const dragOverlay = useRef(null);
-  const { isAuthenticated } = useAuth();
 
   const handleFileSelect = () => {
-    if (!isAuthenticated) {
-      // You can show a message or trigger login modal here
-      alert("Please login to upload files");
-      return;
-    }
     fileInputRef.current?.click();
-  };
-
-  const handleFileUpload = (files) => {
-    if (!isAuthenticated) {
-      alert("Please login to upload files");
-      return;
-    }
-    onFileUpload(files);
-  };
-
-  const handleDrop = (e) => {
-    if (!isAuthenticated) {
-      e.preventDefault();
-      alert("Please login to upload files");
-      return;
-    }
-    onDrop(e);
   };
 
   return (
@@ -45,7 +20,7 @@ export default function UploadArea({
       className="mb-8 border-2 border-dashed border-amber-300 rounded-lg p-8 text-center hover:border-amber-500 transition relative bg-white"
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
-      onDrop={handleDrop}
+      onDrop={onDrop}
     >
       <div className="flex flex-col items-center justify-center">
         <svg
@@ -68,30 +43,19 @@ export default function UploadArea({
           Drag and drop files here or click to select
         </p>
         
-        {!isAuthenticated ? (
-          <div className="mt-4">
-            <p className="text-sm text-amber-600 mb-2">Please login to upload files</p>
-            <SignInButton mode="modal">
-              <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-amber-900 bg-amber-400 hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500">
-                Login to Upload
-              </button>
-            </SignInButton>
-          </div>
-        ) : (
-          <button
-            type="button"
-            onClick={handleFileSelect}
-            className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-amber-900 bg-amber-400 hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
-          >
-            Choose Files
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={handleFileSelect}
+          className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-amber-900 bg-amber-400 hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+        >
+          Choose Files
+        </button>
       </div>
       <input
         ref={fileInputRef}
         type="file"
         multiple
-        onChange={(e) => handleFileUpload(e.target.files)}
+        onChange={(e) => onFileUpload(e.target.files)}
         className="hidden"
       />
 

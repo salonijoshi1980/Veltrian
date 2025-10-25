@@ -35,10 +35,7 @@ export function useFileOperations(encryptionKey) {
       setUploadProgress,
       loadFiles
     ) => {
-      if (!encryptionKey) {
-        setError("Please set up your passphrase first");
-        return;
-      }
+      // REMOVED encryption key check - allow upload without encryption for guest users
 
       setIsUploading(true);
       setError("");
@@ -62,38 +59,53 @@ export function useFileOperations(encryptionKey) {
           const fileMetadata = {
             name: file.name,
             size: file.size,
-            mimeType: file.type || "application/octet-stream", // Default to binary if no type
+            mimeType: file.type || "application/octet-stream",
             createdAt: new Date().toISOString(),
             totalChunks: fileChunks.length,
+            encrypted: !!encryptionKey, // Track if file is encrypted
           };
 
           const fileId = await saveFileMetadata(fileMetadata);
 
-          // Encrypt and save each chunk with batch processing to prevent stack overflow
+          // Process each chunk - encrypt if encryptionKey exists, otherwise store as plain text
           for (
             let chunkIndex = 0;
             chunkIndex < fileChunks.length;
             chunkIndex++
           ) {
-            const { iv, ciphertext } = await encryptChunk(
-              fileChunks[chunkIndex],
-              encryptionKey
-            );
+            let chunkData;
+            
+            if (encryptionKey) {
+              // Encrypt chunk for authenticated users
+              const { iv, ciphertext } = await encryptChunk(
+                fileChunks[chunkIndex],
+                encryptionKey
+              );
+              chunkData = {
+                fileId,
+                chunkIndex,
+                iv,
+                ciphertext,
+                encrypted: true,
+              };
+            } else {
+              // Store plain text for guest users - convert Uint8Array to array for storage
+              const dataArray = Array.from(fileChunks[chunkIndex]);
+              chunkData = {
+                fileId,
+                chunkIndex,
+                data: dataArray, // Store as array for JSON serialization
+                encrypted: false,
+              };
+            }
 
-            await saveChunk({
-              fileId,
-              chunkIndex,
-              iv,
-              ciphertext,
-            });
+            await saveChunk(chunkData);
 
             totalChunksProcessed++;
-            // Update progress based on chunks processed
             setUploadProgress(
               Math.round((totalChunksProcessed / totalChunks) * 100)
             );
 
-            // Add a small delay every 10 chunks to prevent blocking the UI
             if (chunkIndex % 10 === 0) {
               await new Promise((resolve) => setTimeout(resolve, 0));
             }
@@ -107,7 +119,6 @@ export function useFileOperations(encryptionKey) {
         setUploadProgress(0);
         setTimeout(() => setSuccess(""), 3000);
 
-        // Reload files
         await loadFiles();
       } catch (err) {
         console.error("Error uploading files:", err);
@@ -121,7 +132,7 @@ export function useFileOperations(encryptionKey) {
 
   const handlePreview = useCallback(
     async (file, setPreviewFile, setPreviewUrl, setIsLoading, setError) => {
-      if (!encryptionKey) return;
+      // REMOVED encryption key requirement
 
       setError("");
       setIsLoading(true);
@@ -131,23 +142,29 @@ export function useFileOperations(encryptionKey) {
         const decryptedChunks = [];
 
         for (const chunk of chunks) {
-          const decrypted = await decryptChunk(
-            chunk.iv,
-            chunk.ciphertext,
-            encryptionKey
-          );
+          let decrypted;
+          
+          if (chunk.encrypted && encryptionKey) {
+            // Decrypt encrypted chunks
+            decrypted = await decryptChunk(
+              chunk.iv,
+              chunk.ciphertext,
+              encryptionKey
+            );
+          } else if (!chunk.encrypted && chunk.data) {
+            // Use plain data for guest files - convert array back to Uint8Array
+            decrypted = new Uint8Array(chunk.data);
+          } else {
+            throw new Error("Invalid chunk data");
+          }
+          
           decryptedChunks.push(decrypted);
         }
 
         const blob = reconstructFile(decryptedChunks, file.mimeType);
-
-        // Revoke previous preview URL before setting a new one
-        // Create a more robust URL for the blob
         const url = URL.createObjectURL(blob);
 
-        // For PDFs, we might need to ensure proper handling
         if (file.mimeType === "application/pdf") {
-          // Add a small delay to ensure blob is ready
           await new Promise((resolve) => setTimeout(resolve, 100));
         }
 
@@ -168,7 +185,6 @@ export function useFileOperations(encryptionKey) {
       if (!window.confirm("Are you sure you want to delete this file?")) return;
 
       setError("");
-      // setIsLoading(true); // We're not using setIsLoading here to avoid UI blocking
 
       try {
         await deleteFile(fileId);
@@ -178,8 +194,6 @@ export function useFileOperations(encryptionKey) {
       } catch (err) {
         console.error("Error deleting file:", err);
         setError("Failed to delete file");
-      } finally {
-        // setIsLoading(false);
       }
     },
     []
@@ -187,7 +201,7 @@ export function useFileOperations(encryptionKey) {
 
   const handleExportFile = useCallback(
     async (file, setSuccess, setError, setIsLoading) => {
-      if (!encryptionKey) return;
+      // REMOVED encryption key requirement
 
       setError("");
       setIsLoading(true);
@@ -197,11 +211,20 @@ export function useFileOperations(encryptionKey) {
         const decryptedChunks = [];
 
         for (const chunk of chunks) {
-          const decrypted = await decryptChunk(
-            chunk.iv,
-            chunk.ciphertext,
-            encryptionKey
-          );
+          let decrypted;
+          
+          if (chunk.encrypted && encryptionKey) {
+            decrypted = await decryptChunk(
+              chunk.iv,
+              chunk.ciphertext,
+              encryptionKey
+            );
+          } else if (!chunk.encrypted && chunk.data) {
+            decrypted = new Uint8Array(chunk.data);
+          } else {
+            throw new Error("Invalid chunk data");
+          }
+          
           decryptedChunks.push(decrypted);
         }
 
@@ -280,7 +303,6 @@ export function useFileOperations(encryptionKey) {
         setError("Failed to import backup");
       } finally {
         setIsLoading(false);
-        // Reset input
         if (backupInputRef.current) {
           backupInputRef.current.value = "";
         }
