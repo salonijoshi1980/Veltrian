@@ -22,6 +22,7 @@ export default function AppPage() {
   // Guest access state
   const [showLoginSplash, setShowLoginSplash] = useState(false);
   const [guestAccessActive, setGuestAccessActive] = useState(true);
+  const [extendedGuestMode, setExtendedGuestMode] = useState(false);
 
   // Encryption state
   const [passphrase, setPassphrase] = useState("");
@@ -32,6 +33,7 @@ export default function AppPage() {
   const [files, setFiles] = useState([]);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
+  const [currentUploadFile, setCurrentUploadFile] = useState(null);
 
   // Preview state
   const [previewFile, setPreviewFile] = useState(null);
@@ -50,20 +52,26 @@ export default function AppPage() {
   // Guest access management
   const GUEST_ACCESS_KEY = 'veltrain_guest_access';
   const GUEST_FIRST_VISIT_KEY = 'veltrain_first_visit';
+  const EXTENDED_GUEST_KEY = 'veltrain_extended_guest';
+  const GUEST_BACKUP_REMINDER_KEY = 'veltrain_guest_backup_reminder';
 
   // Initialize
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  // Check if this is user's first visit
-  const isFirstVisit = () => {
-    return !localStorage.getItem(GUEST_FIRST_VISIT_KEY);
+  // Check extended guest mode
+  const isExtendedGuestMode = () => {
+    return localStorage.getItem(EXTENDED_GUEST_KEY) === 'true';
   };
 
-  // Mark first visit
-  const markFirstVisit = () => {
-    localStorage.setItem(GUEST_FIRST_VISIT_KEY, 'true');
+  // Set extended guest mode
+  const setExtendedGuestModeFlag = (value) => {
+    if (value) {
+      localStorage.setItem(EXTENDED_GUEST_KEY, 'true');
+    } else {
+      localStorage.removeItem(EXTENDED_GUEST_KEY);
+    }
   };
 
   // Get guest access data
@@ -100,63 +108,64 @@ export default function AppPage() {
     return now > data.expiresAt;
   };
 
-  // Get guest access usage count
-  const getGuestAccessUsageCount = () => {
-    const data = getGuestAccessData();
-    return data ? data.usageCount : 0;
-  };
-
-  // Increment guest access usage
-  const incrementGuestAccessUsage = () => {
-    const data = getGuestAccessData();
-    if (data) {
-      data.usageCount = (data.usageCount || 0) + 1;
-      localStorage.setItem(GUEST_ACCESS_KEY, JSON.stringify(data));
+  // Clear guest files from IndexedDB when session ends
+  const clearGuestFiles = async () => {
+    if (!isAuthenticated) {
+      try {
+        // Clear all files for guest users
+        const currentFiles = await guestFileOperations.loadFiles(setFiles, setError);
+        if (currentFiles && currentFiles.length > 0) {
+          // Delete all guest files
+          for (const file of currentFiles) {
+            await guestFileOperations.handleDelete(file.id, setSuccess, setError, () => {});
+          }
+        }
+        setFiles([]);
+      } catch (error) {
+        console.error("Error clearing guest files:", error);
+      }
     }
   };
 
   // Start guest access timer when user accesses the app without login
   useEffect(() => {
     if (isLoaded && !isAuthenticated) {
-      // Check if this is first visit
-      if (isFirstVisit()) {
+      // Check if user is in extended guest mode
+      if (isExtendedGuestMode()) {
+        setExtendedGuestMode(true);
+        setGuestAccessActive(true);
+        setShowLoginSplash(false);
+        loadGuestFiles();
+        return;
+      }
+
+      // Check if guest access has expired
+      if (hasGuestAccessExpired()) {
+        setShowLoginSplash(true);
+        setGuestAccessActive(false);
+        return;
+      }
+
+      const guestData = getGuestAccessData();
+      
+      if (!guestData) {
         // First visit - grant 2 minutes access
         const expiresAt = Date.now() + (2 * 60 * 1000);
         setGuestAccessData(expiresAt, 0);
-        markFirstVisit();
         setGuestAccessActive(true);
         startGuestAccessTimer();
         loadGuestFiles();
       } else {
-        // Not first visit - check existing access
-        const guestData = getGuestAccessData();
-        
-        if (!guestData || hasGuestAccessExpired()) {
-          // No valid guest access
-          setShowLoginSplash(true);
-          setGuestAccessActive(false);
-          return;
-        }
-
-        // Check usage limits (optional: limit number of guest sessions)
-        const usageCount = getGuestAccessUsageCount();
-        if (usageCount >= 3) { // Limit to 3 guest sessions
-          setShowLoginSplash(true);
-          setGuestAccessActive(false);
-          return;
-        }
-
         // Valid guest access
         setGuestAccessActive(true);
         startGuestAccessTimer();
         loadGuestFiles();
-        
-        // Increment usage count
-        incrementGuestAccessUsage();
       }
     } else {
       // Clear guest data when user logs in
       clearGuestAccessData();
+      setExtendedGuestModeFlag(false);
+      setExtendedGuestMode(false);
       setGuestAccessActive(false);
       setShowLoginSplash(false);
     }
@@ -167,6 +176,16 @@ export default function AppPage() {
       }
     };
   }, [isLoaded, isAuthenticated]);
+
+  // Clear guest files when component unmounts or user leaves
+  useEffect(() => {
+    return () => {
+      if (!isAuthenticated) {
+        // Clear guest files when user leaves the page
+        clearGuestFiles();
+      }
+    };
+  }, [isAuthenticated]);
 
   // Guest access timer
   const startGuestAccessTimer = () => {
@@ -188,26 +207,27 @@ export default function AppPage() {
     guestTimerRef.current = setTimeout(() => {
       setShowLoginSplash(true);
       setGuestAccessActive(false);
-      clearGuestAccessData(); // Clear the data since timer completed
+      // Clear guest files when timer expires
+      clearGuestFiles();
     }, timeLeft);
+  };
+
+  // Handle continue as guest
+  const handleContinueAsGuest = () => {
+    setExtendedGuestMode(true);
+    setExtendedGuestModeFlag(true);
+    setShowLoginSplash(false);
+    setGuestAccessActive(true);
+    setError("You're in extended guest mode. Export your backup to save your work - it will be lost when you leave!");
+    
+    // Clear the error after 5 seconds
+    setTimeout(() => setError(""), 5000);
   };
 
   // Reset guest timer on user interaction
   const resetGuestTimer = () => {
-    if (!isAuthenticated && guestAccessActive) {
-      // Don't reset the expiry time, just restart the timer
+    if (!isAuthenticated && guestAccessActive && !extendedGuestMode) {
       startGuestAccessTimer();
-    }
-  };
-
-  // Clear all guest data (nuclear option)
-  const clearAllGuestData = () => {
-    clearGuestAccessData();
-    localStorage.removeItem(GUEST_FIRST_VISIT_KEY);
-    // Also clear any guest files from IndexedDB
-    if (typeof window !== 'undefined' && window.indexedDB) {
-      // This would require your database cleanup logic
-      console.log('Clearing guest data...');
     }
   };
 
@@ -288,10 +308,10 @@ export default function AppPage() {
   };
 
   const handleFileUploadWrapper = (files) => {
-    // Check if guest access has expired
-    if (!isAuthenticated && showLoginSplash) {
-      setError("Please login to continue using the platform");
-      return;
+    // Check if we're in extended guest mode and show warning
+    if (!isAuthenticated && extendedGuestMode) {
+      setError("⚠️ Guest Mode: Export your backup to save your work. Files will be lost when you leave!");
+      setTimeout(() => setError(""), 7000);
     }
 
     resetGuestTimer();
@@ -301,6 +321,11 @@ export default function AppPage() {
     if (isAuthenticated && !encryptionKey) {
       setError("Please set up your encryption passphrase first");
       return;
+    }
+
+    // Set current upload file for progress display
+    if (files.length > 0) {
+      setCurrentUploadFile(files[0].name);
     }
 
     fileOps.handleFileUpload(
@@ -315,17 +340,15 @@ export default function AppPage() {
         } else {
           loadGuestFiles();
         }
+        // Reset upload state
+        setCurrentUploadFile(null);
+        setUploadProgress(0);
       }
     );
   };
 
-  // Handle backup operations
+  // Handle backup operations - ENABLED for guest users to export their work
   const handleExportBackupWrapper = () => {
-    if (!isAuthenticated && showLoginSplash) {
-      setError("Please login to continue using the platform");
-      return;
-    }
-
     resetGuestTimer();
 
     const fileOps = isAuthenticated ? authFileOperations : guestFileOperations;
@@ -339,8 +362,9 @@ export default function AppPage() {
   };
 
   const handleImportBackupWrapper = (e) => {
-    if (!isAuthenticated && showLoginSplash) {
-      setError("Please login to continue using the platform");
+    // Only allow import for authenticated users
+    if (!isAuthenticated) {
+      setError("Please login to import backups. Guest users can only export their work.");
       return;
     }
 
@@ -371,11 +395,6 @@ export default function AppPage() {
 
   // Handle file operations
   const handlePreviewWrapper = (file) => {
-    if (!isAuthenticated && showLoginSplash) {
-      setError("Please login to continue using the platform");
-      return;
-    }
-
     resetGuestTimer();
 
     const fileOps = isAuthenticated ? authFileOperations : guestFileOperations;
@@ -395,29 +414,14 @@ export default function AppPage() {
   };
 
   const handleExportWrapper = (file) => {
-    if (!isAuthenticated && showLoginSplash) {
-      setError("Please login to continue using the platform");
-      return;
-    }
-
     resetGuestTimer();
 
     const fileOps = isAuthenticated ? authFileOperations : guestFileOperations;
     
-    if (isAuthenticated && !encryptionKey) {
-      setError("Please set up your encryption passphrase first");
-      return;
-    }
-
     fileOps.handleExportFile(file, setSuccess, setError, setIsLoading);
   };
 
   const handleDeleteWrapper = (fileId) => {
-    if (!isAuthenticated && showLoginSplash) {
-      setError("Please login to continue using the platform");
-      return;
-    }
-
     resetGuestTimer();
 
     const fileOps = isAuthenticated ? authFileOperations : guestFileOperations;
@@ -443,17 +447,6 @@ export default function AppPage() {
     }
     setPreviewFile(null);
     setPreviewUrl("");
-  };
-
-  // Force clear guest data (for testing)
-  const handleForceClearGuestData = () => {
-    clearAllGuestData();
-    setShowLoginSplash(false);
-    setGuestAccessActive(true);
-    // Give them one more chance
-    const expiresAt = Date.now() + (2 * 60 * 1000);
-    setGuestAccessData(expiresAt, 0);
-    startGuestAccessTimer();
   };
 
   if (!isClient || !isLoaded) {
@@ -485,33 +478,41 @@ export default function AppPage() {
 
             <div className="bg-amber-50 rounded-lg p-6 mb-8">
               <h2 className="text-xl font-bold text-amber-900 mb-4">
-                Continue Your Journey
+                Save Your Work!
               </h2>
               <p className="text-amber-700 mb-6">
-                Your guest session has ended. Login to save your work and continue managing your files securely.
+                Your guest session has ended. Export your backup to save your work, or login for automatic saving.
               </p>
               
-              <SignInButton mode="modal">
-                <button className="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-medium rounded-lg transition shadow-md hover:shadow-lg mb-4">
-                  Login to Continue
-                </button>
-              </SignInButton>
-              
-             
-              
-              {/* Debug button - remove in production
-              {process.env.NODE_ENV === 'development' && (
-                <button 
-                  onClick={handleForceClearGuestData}
-                  className="mt-4 text-xs text-gray-500 underline"
+              <div className="space-y-4">
+                <button
+                  onClick={handleExportBackupWrapper}
+                  className="w-full py-3 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition shadow-md hover:shadow-lg"
                 >
-                  Reset Guest Access (Dev Only)
+                  📥 Export Backup & Save Work
                 </button>
-              )} */}
+                
+                <SignInButton mode="modal">
+                  <button className="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-medium rounded-lg transition shadow-md hover:shadow-lg">
+                    🔐 Login for Auto-Save
+                  </button>
+                </SignInButton>
+                
+                <button
+                  onClick={handleContinueAsGuest}
+                  className="w-full py-3 border border-amber-500 text-amber-700 hover:bg-amber-50 font-medium rounded-lg transition"
+                >
+                  ⚠️ Continue as Guest (Unsaved)
+                </button>
+              </div>
+              
+              <p className="text-sm text-amber-600 mt-4">
+                Don't have an account? Sign up for free
+              </p>
             </div>
 
             <div className="text-xs text-gray-500">
-              <p>🔒 All your data stays private on your device</p>
+              <p>🔒 Export your backup to never lose your work</p>
             </div>
           </div>
         </div>
@@ -543,9 +544,14 @@ export default function AppPage() {
               </div>
             ) : (
               <div className="flex items-center space-x-4">
+                {extendedGuestMode && (
+                  <div className="flex items-center space-x-2 text-sm text-amber-700 bg-amber-100 px-3 py-1 rounded-full">
+                    <span>⚠️ Export Backup to Save Work</span>
+                  </div>
+                )}
                 <SignInButton mode="modal">
                   <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-amber-900 bg-amber-200 hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500">
-                    Login
+                    Login to Save
                   </button>
                 </SignInButton>
               </div>
@@ -556,6 +562,37 @@ export default function AppPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        {/* Extended Guest Mode Warning */}
+        {extendedGuestMode && !isAuthenticated && (
+          <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-yellow-700">
+            <div className="flex items-center">
+              <span className="text-lg mr-2">⚠️</span>
+              <div>
+                <p className="font-medium">Guest Mode - Export Your Backup!</p>
+                <p className="text-sm">Your work will be lost when you leave. Export your backup to save it permanently.</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Upload Progress Bar */}
+        {isUploading && (
+          <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-blue-700">
+                Uploading {currentUploadFile || "file"}...
+              </span>
+              <span className="text-sm text-blue-600">{uploadProgress}%</span>
+            </div>
+            <div className="w-full bg-blue-200 rounded-full h-2">
+              <div
+                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${uploadProgress}%` }}
+              ></div>
+            </div>
+          </div>
+        )}
+
         {/* Alerts */}
         {error && (
           <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
@@ -572,16 +609,19 @@ export default function AppPage() {
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold text-amber-900">
               Your Files ({files.length})
+              {extendedGuestMode && !isAuthenticated && (
+                <span className="text-sm font-normal text-yellow-600 ml-2">(Temporary - Export to Save)</span>
+              )}
             </h2>
             <div className="flex space-x-2">
               <button
                 onClick={handleExportBackupWrapper}
-                disabled={isLoading || (!isAuthenticated && showLoginSplash) || (isAuthenticated && !encryptionKey)}
+                disabled={isLoading || (isAuthenticated && !encryptionKey)}
                 className="inline-flex items-center px-4 py-2 border border-amber-300 text-sm font-medium rounded-md text-amber-800 bg-amber-100 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50"
               >
-                Export Backup
+                {!isAuthenticated ? "📥 Export Backup to Save" : "Export Backup"}
               </button>
-              <label className={`inline-flex items-center px-4 py-2 border border-amber-300 text-sm font-medium rounded-md text-amber-800 bg-amber-100 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 ${(isLoading || (!isAuthenticated && showLoginSplash) || (isAuthenticated && !encryptionKey)) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+              <label className={`inline-flex items-center px-4 py-2 border border-amber-300 text-sm font-medium rounded-md text-amber-800 bg-amber-100 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 ${(isLoading || !isAuthenticated || (isAuthenticated && !encryptionKey)) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
                 Import Backup
                 <input
                   type="file"
@@ -589,7 +629,7 @@ export default function AppPage() {
                   onChange={handleImportBackupWrapper}
                   accept=".backup,.json"
                   className="hidden"
-                  disabled={isLoading || (!isAuthenticated && showLoginSplash) || (isAuthenticated && !encryptionKey)}
+                  disabled={isLoading || !isAuthenticated || (isAuthenticated && !encryptionKey)}
                 />
               </label>
             </div>
