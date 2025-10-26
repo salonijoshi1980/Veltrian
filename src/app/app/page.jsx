@@ -651,7 +651,7 @@ export default function AppPage() {
                 </SignInButton>
               </div>
             )}
-=======
+
             <div className="flex items-center space-x-4">
               <span className="text-sm font-medium text-amber-800">
                 Hello, {user?.firstName || user?.email || "User"}!
@@ -662,7 +662,6 @@ export default function AppPage() {
                 </button>
               </SignOutButton>
             </div>
->>>>>>> ef34e2aceec70c9fb72b58810f1b5e7647a4d5ac
           </div>
         </div>
       </header>
