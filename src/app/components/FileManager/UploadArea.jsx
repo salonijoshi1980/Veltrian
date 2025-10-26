@@ -11,10 +11,13 @@ export default function UploadArea({
 }) {
   const dragOverlay = useRef(null);
 
+<<<<<<< HEAD
   const handleFileSelect = () => {
     fileInputRef.current?.click();
   };
 
+=======
+>>>>>>> ef34e2aceec70c9fb72b58810f1b5e7647a4d5ac
   return (
     <div
       className="mb-8 border-2 border-dashed border-amber-300 rounded-lg p-8 text-center hover:border-amber-500 transition relative bg-white"
@@ -42,10 +45,16 @@ export default function UploadArea({
         <p className="mt-1 text-sm text-amber-700">
           Drag and drop files here or click to select
         </p>
+<<<<<<< HEAD
         
         <button
           type="button"
           onClick={handleFileSelect}
+=======
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+>>>>>>> ef34e2aceec70c9fb72b58810f1b5e7647a4d5ac
           className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-amber-900 bg-amber-400 hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
         >
           Choose Files
@@ -83,4 +92,8 @@ export default function UploadArea({
       )}
     </div>
   );
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> ef34e2aceec70c9fb72b58810f1b5e7647a4d5ac

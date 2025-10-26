@@ -94,5 +94,8 @@ export default function FileList({
     </div>
   );
 }
+<<<<<<< HEAD
 
 //bottom file manager
+=======
+>>>>>>> ef34e2aceec70c9fb72b58810f1b5e7647a4d5ac

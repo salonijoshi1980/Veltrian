@@ -2,7 +2,11 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useAuth, useUser } from "@/utils/clerkAuth";
+<<<<<<< HEAD
 import { SignOutButton, SignInButton } from "@clerk/clerk-react";
+=======
+import { SignOutButton } from "@clerk/clerk-react";
+>>>>>>> ef34e2aceec70c9fb72b58810f1b5e7647a4d5ac
 import { useFileOperations } from "@/app/hooks/useFileOperations";
 import { useFormatting } from "@/app/hooks/useFormatting";
 import { deriveKey } from "@/utils/crypto";
@@ -19,6 +23,7 @@ export default function AppPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+<<<<<<< HEAD
   // Guest access state
   const [showLoginSplash, setShowLoginSplash] = useState(false);
   const [guestAccessActive, setGuestAccessActive] = useState(true);
@@ -28,12 +33,21 @@ export default function AppPage() {
   const [passphrase, setPassphrase] = useState("");
   const [encryptionKey, setEncryptionKey] = useState(null);
   const [showPassphraseSetup, setShowPassphraseSetup] = useState(false);
+=======
+  // Encryption state
+  const [passphrase, setPassphrase] = useState("");
+  const [encryptionKey, setEncryptionKey] = useState(null);
+  const [showPassphraseSetup, setShowPassphraseSetup] = useState(true);
+>>>>>>> ef34e2aceec70c9fb72b58810f1b5e7647a4d5ac
 
   // File management state
   const [files, setFiles] = useState([]);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
+<<<<<<< HEAD
   const [currentUploadFile, setCurrentUploadFile] = useState(null);
+=======
+>>>>>>> ef34e2aceec70c9fb72b58810f1b5e7647a4d5ac
 
   // Preview state
   const [previewFile, setPreviewFile] = useState(null);
@@ -41,6 +55,7 @@ export default function AppPage() {
 
   const fileInputRef = useRef(null);
   const backupInputRef = useRef(null);
+<<<<<<< HEAD
   const guestTimerRef = useRef(null);
 
   // Custom hooks
@@ -256,6 +271,46 @@ export default function AppPage() {
       loadGuestFiles();
     }
   }, [isAuthenticated, isLoaded, encryptionKey]);
+=======
+
+  // Custom hooks
+  const {
+    loadFiles,
+    handleFileUpload,
+    handlePreview,
+    handleDelete,
+    handleExportFile,
+    handleExportBackup,
+    handleImportBackup,
+  } = useFileOperations(encryptionKey);
+
+  const { formatFileSize, formatDate } = useFormatting();
+
+  // Initialize
+  useEffect(() => {
+    setIsClient(true);
+
+    // Redirect unauthenticated users to login
+    if (isLoaded && !isAuthenticated) {
+      window.location.href = "/login";
+    }
+  }, [isLoaded, isAuthenticated]);
+
+  // Check if we need to show encryption setup or restore key
+  useEffect(() => {
+    if (isAuthenticated && isLoaded) {
+      // Never restore from storage; require user input each session
+      setShowPassphraseSetup(true);
+    }
+  }, [isAuthenticated, isLoaded]);
+
+  // Load files from IndexedDB
+  useEffect(() => {
+    if (isAuthenticated && isLoaded && encryptionKey) {
+      loadFiles(setFiles, setError);
+    }
+  }, [isAuthenticated, isLoaded, encryptionKey, loadFiles]);
+>>>>>>> ef34e2aceec70c9fb72b58810f1b5e7647a4d5ac
 
   // Setup encryption key from passphrase
   const handleSetupPassphrase = async (passphrase) => {
@@ -274,7 +329,13 @@ export default function AppPage() {
       setShowPassphraseSetup(false);
       setSuccess("Encryption key set successfully!");
 
+<<<<<<< HEAD
       sessionStorage.setItem("encryptionKeySet", "true");
+=======
+      // Do not persist passphrase; keep key only in memory
+      sessionStorage.setItem("encryptionKeySet", "true");
+
+>>>>>>> ef34e2aceec70c9fb72b58810f1b5e7647a4d5ac
       setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
       console.error("Error setting up passphrase:", err);
@@ -288,7 +349,10 @@ export default function AppPage() {
   const handleDragOver = (e) => {
     e.preventDefault();
     e.stopPropagation();
+<<<<<<< HEAD
     resetGuestTimer();
+=======
+>>>>>>> ef34e2aceec70c9fb72b58810f1b5e7647a4d5ac
   };
 
   const handleDragLeave = (e) => {
@@ -299,7 +363,10 @@ export default function AppPage() {
   const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
+<<<<<<< HEAD
     resetGuestTimer();
+=======
+>>>>>>> ef34e2aceec70c9fb72b58810f1b5e7647a4d5ac
 
     const files = e.dataTransfer.files;
     if (files.length > 0) {
@@ -308,6 +375,7 @@ export default function AppPage() {
   };
 
   const handleFileUploadWrapper = (files) => {
+<<<<<<< HEAD
     // Check if we're in extended guest mode and show warning
     if (!isAuthenticated && extendedGuestMode) {
       setError("⚠️ Guest Mode: Export your backup to save your work. Files will be lost when you leave!");
@@ -329,11 +397,15 @@ export default function AppPage() {
     }
 
     fileOps.handleFileUpload(
+=======
+    handleFileUpload(
+>>>>>>> ef34e2aceec70c9fb72b58810f1b5e7647a4d5ac
       files,
       setIsUploading,
       setError,
       setSuccess,
       setUploadProgress,
+<<<<<<< HEAD
       () => {
         if (isAuthenticated) {
           authFileOperations.loadFiles(setFiles, setError);
@@ -443,12 +515,23 @@ export default function AppPage() {
   // Close preview
   const closePreview = () => {
     if (previewUrl) {
+=======
+      () => loadFiles(setFiles, setError)
+    );
+  };
+
+  // Close preview
+  const closePreview = () => {
+    if (previewUrl) {
+      // Revoke the blob URL to free memory
+>>>>>>> ef34e2aceec70c9fb72b58810f1b5e7647a4d5ac
       URL.revokeObjectURL(previewUrl);
     }
     setPreviewFile(null);
     setPreviewUrl("");
   };
 
+<<<<<<< HEAD
   if (!isClient || !isLoaded) {
     return (
       <div className="min-h-screen bg-amber-50 flex items-center justify-center">
@@ -518,6 +601,17 @@ export default function AppPage() {
         </div>
       )}
 
+=======
+  if (!isClient || !isLoaded) return null;
+
+  if (!isAuthenticated) {
+    return null; // Will redirect in useEffect
+  }
+
+  // Main app screen - always rendered
+  return (
+    <div className="min-h-screen bg-amber-50">
+>>>>>>> ef34e2aceec70c9fb72b58810f1b5e7647a4d5ac
       {/* Header */}
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -530,6 +624,7 @@ export default function AppPage() {
               />
               <h1 className="text-xl font-bold text-amber-700">Veltrain</h1>
             </div>
+<<<<<<< HEAD
             
             {isAuthenticated ? (
               <div className="flex items-center space-x-4">
@@ -556,12 +651,25 @@ export default function AppPage() {
                 </SignInButton>
               </div>
             )}
+=======
+            <div className="flex items-center space-x-4">
+              <span className="text-sm font-medium text-amber-800">
+                Hello, {user?.firstName || user?.email || "User"}!
+              </span>
+              <SignOutButton>
+                <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-amber-900 bg-amber-200 hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500">
+                  Logout
+                </button>
+              </SignOutButton>
+            </div>
+>>>>>>> ef34e2aceec70c9fb72b58810f1b5e7647a4d5ac
           </div>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+<<<<<<< HEAD
         {/* Extended Guest Mode Warning */}
         {extendedGuestMode && !isAuthenticated && (
           <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-yellow-700">
@@ -593,6 +701,8 @@ export default function AppPage() {
           </div>
         )}
 
+=======
+>>>>>>> ef34e2aceec70c9fb72b58810f1b5e7647a4d5ac
         {/* Alerts */}
         {error && (
           <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
@@ -609,6 +719,7 @@ export default function AppPage() {
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold text-amber-900">
               Your Files ({files.length})
+<<<<<<< HEAD
               {extendedGuestMode && !isAuthenticated && (
                 <span className="text-sm font-normal text-yellow-600 ml-2">(Temporary - Export to Save)</span>
               )}
@@ -622,14 +733,44 @@ export default function AppPage() {
                 {!isAuthenticated ? "📥 Export Backup to Save" : "Export Backup"}
               </button>
               <label className={`inline-flex items-center px-4 py-2 border border-amber-300 text-sm font-medium rounded-md text-amber-800 bg-amber-100 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 ${(isLoading || !isAuthenticated || (isAuthenticated && !encryptionKey)) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+=======
+            </h2>
+            <div className="flex space-x-2">
+              <button
+                onClick={() =>
+                  handleExportBackup(setIsLoading, setError, setSuccess)
+                }
+                disabled={isLoading}
+                className="inline-flex items-center px-4 py-2 border border-amber-300 text-sm font-medium rounded-md text-amber-800 bg-amber-100 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50"
+              >
+                Export Backup
+              </button>
+              <label className="inline-flex items-center px-4 py-2 border border-amber-300 text-sm font-medium rounded-md text-amber-800 bg-amber-100 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 cursor-pointer disabled:opacity-50">
+>>>>>>> ef34e2aceec70c9fb72b58810f1b5e7647a4d5ac
                 Import Backup
                 <input
                   type="file"
                   ref={backupInputRef}
+<<<<<<< HEAD
                   onChange={handleImportBackupWrapper}
                   accept=".backup,.json"
                   className="hidden"
                   disabled={isLoading || !isAuthenticated || (isAuthenticated && !encryptionKey)}
+=======
+                  onChange={(e) =>
+                    handleImportBackup(
+                      e,
+                      setSuccess,
+                      setError,
+                      setIsLoading,
+                      () => loadFiles(setFiles, setError),
+                      backupInputRef
+                    )
+                  }
+                  accept=".backup,.json"
+                  className="hidden"
+                  disabled={isLoading}
+>>>>>>> ef34e2aceec70c9fb72b58810f1b5e7647a4d5ac
                 />
               </label>
             </div>
@@ -650,9 +791,29 @@ export default function AppPage() {
         {/* Files List */}
         <FileList
           files={files}
+<<<<<<< HEAD
           onPreview={handlePreviewWrapper}
           onExport={handleExportWrapper}
           onDelete={handleDeleteWrapper}
+=======
+          onPreview={(file) =>
+            handlePreview(
+              file,
+              setPreviewFile,
+              setPreviewUrl,
+              setIsLoading,
+              setError
+            )
+          }
+          onExport={(file) =>
+            handleExportFile(file, setSuccess, setError, setIsLoading)
+          }
+          onDelete={(fileId) =>
+            handleDelete(fileId, setSuccess, setError, () =>
+              loadFiles(setFiles, setError)
+            )
+          }
+>>>>>>> ef34e2aceec70c9fb72b58810f1b5e7647a4d5ac
           isLoading={isLoading}
           formatFileSize={formatFileSize}
           formatDate={formatDate}
@@ -670,8 +831,13 @@ export default function AppPage() {
         }}
       />
 
+<<<<<<< HEAD
       {/* Passphrase Setup Modal - Only show for authenticated users */}
       {showPassphraseSetup && isAuthenticated && (
+=======
+      {/* Passphrase Setup Modal */}
+      {showPassphraseSetup && (
+>>>>>>> ef34e2aceec70c9fb72b58810f1b5e7647a4d5ac
         <PassphraseSetupModal
           onSetupComplete={handleSetupPassphrase}
           isLoading={isLoading}
@@ -680,4 +846,8 @@ export default function AppPage() {
       )}
     </div>
   );
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> ef34e2aceec70c9fb72b58810f1b5e7647a4d5ac
