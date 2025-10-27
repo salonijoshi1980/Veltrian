@@ -15,7 +15,7 @@ export default function Header() {
               <img
                 src="/Dragon logo1.png"
                 alt="Veltrian Logo"
-                className="w-8 h-7 object-contain -mr-3"
+                className="w-11 h-9 object-contain -mr-3"
               />
               <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent pt-0.5">
                 eltrian

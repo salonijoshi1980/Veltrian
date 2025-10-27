@@ -17,14 +17,14 @@ export default function UploadArea({
 
   return (
     <div
-      className="mb-8 border-2 border-dashed border-amber-300 rounded-lg p-8 text-center hover:border-amber-500 transition relative bg-white"
+      className="mb-8 border-2 border-dashed border-slate-300 rounded-lg p-8 text-center hover:border-slate-500 transition relative bg-white"
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={onDrop}
     >
       <div className="flex flex-col items-center justify-center">
         <svg
-          className="mx-auto h-12 w-12 text-amber-500"
+          className="mx-auto h-12 w-12 text-slate-500"
           stroke="currentColor"
           fill="none"
           viewBox="0 0 48 48"
@@ -36,17 +36,17 @@ export default function UploadArea({
             strokeLinejoin="round"
           />
         </svg>
-        <h3 className="mt-2 text-lg font-medium text-amber-900">
+        <h3 className="mt-2 text-lg font-medium text-slate-900">
           Upload Files
         </h3>
-        <p className="mt-1 text-sm text-amber-700">
+        <p className="mt-1 text-sm text-slate-700">
           Drag and drop files here or click to select
         </p>
-        
+
         <button
           type="button"
           onClick={handleFileSelect}
-          className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-amber-900 bg-amber-400 hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+          className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-purple-500 to-blue-500 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
         >
           Choose Files
         </button>
@@ -62,25 +62,10 @@ export default function UploadArea({
       {/* Drag overlay */}
       <div
         ref={dragOverlay}
-        className="absolute inset-0 bg-amber-500/10 border-2 border-dashed border-amber-400 rounded-lg flex items-center justify-center hidden"
+        className="absolute inset-0 bg-slate-500/10 border-2 border-dashed border-slate-400 rounded-lg flex items-center justify-center hidden"
       >
-        <div className="text-amber-700 font-medium">Drop files here</div>
+        <div className="text-slate-700 font-medium">Drop files here</div>
       </div>
-
-      {isUploading && (
-        <div className="mt-4">
-          <div className="flex justify-between text-sm text-amber-700 mb-1">
-            <span>Uploading...</span>
-            <span>{uploadProgress}%</span>
-          </div>
-          <div className="h-2 bg-amber-200 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-amber-500 rounded-full transition-all duration-300"
-              style={{ width: `${uploadProgress}%` }}
-            ></div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

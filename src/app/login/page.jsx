@@ -25,11 +25,20 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full border border-slate-200">
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Veltrian</h1>
-          <p className="text-gray-600">Cloudless File Manager</p>
+          <div className="flex items-center justify-center">
+            <img
+              src="/Dragon logo1.png"
+              alt="Veltrian Logo"
+              className="w-12 h-12 object-contain -mr-2"
+            />
+            <span className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent pt-0.5">
+              eltrian
+            </span>
+          </div>
+          <p className="text-slate-600 mt-2">Cloudless File Manager</p>
         </div>
 
         <div className="flex justify-center">
@@ -45,7 +54,7 @@ export default function LoginPage() {
           />
         </div>
 
-        <div className="mt-6 pt-6 border-t border-gray-200 text-center text-xs text-gray-500">
+        <div className="mt-6 pt-6 border-t border-slate-200 text-center text-xs text-slate-500">
           <p>🔒 Privacy-First File Manager</p>
           <p className="mt-2">All data stays local in your browser</p>
         </div>

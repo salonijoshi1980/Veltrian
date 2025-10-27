@@ -14,10 +14,33 @@ import PreviewModal from "@/app/components/FileManager/PreviewModal";
 export default function AppPage() {
   const { isLoaded, isAuthenticated } = useAuth();
   const { isLoaded: isUserLoaded, isSignedIn, user } = useUser();
-  const [isClient, setIsClient] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  // Show loading state while authentication is loading
+  if (!isLoaded || !isUserLoaded) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="flex items-center justify-center mb-6">
+            <img
+              src="/Dragon logo1.png"
+              alt="Veltrian Logo"
+              className="w-16 h-16 object-contain mr-4"
+            />
+            <span className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              eltrian
+            </span>
+          </div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p className="text-slate-600 font-medium">
+            Loading your workspace...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   // Guest access state
   const [showLoginSplash, setShowLoginSplash] = useState(false);
@@ -54,11 +77,6 @@ export default function AppPage() {
   const GUEST_FIRST_VISIT_KEY = "veltrain_first_visit";
   const EXTENDED_GUEST_KEY = "veltrain_extended_guest";
   const GUEST_BACKUP_REMINDER_KEY = "veltrain_guest_backup_reminder";
-
-  // Initialize
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   // Check extended guest mode
   const isExtendedGuestMode = () => {
@@ -424,7 +442,6 @@ export default function AppPage() {
     );
   };
 
-  // Handle file operations
   const handlePreviewWrapper = (file) => {
     resetGuestTimer();
 
@@ -444,10 +461,20 @@ export default function AppPage() {
     );
   };
 
+  const closePreview = () => {
+    setPreviewFile(null);
+    setPreviewUrl("");
+  };
+
   const handleExportWrapper = (file) => {
     resetGuestTimer();
 
     const fileOps = isAuthenticated ? authFileOperations : guestFileOperations;
+
+    if (isAuthenticated && !encryptionKey) {
+      setError("Please set up your encryption passphrase first");
+      return;
+    }
 
     fileOps.handleExportFile(file, setSuccess, setError, setIsLoading);
   };
@@ -471,28 +498,8 @@ export default function AppPage() {
     });
   };
 
-  // Close preview
-  const closePreview = () => {
-    if (previewUrl) {
-      URL.revokeObjectURL(previewUrl);
-    }
-    setPreviewFile(null);
-    setPreviewUrl("");
-  };
-
-  if (!isClient || !isLoaded) {
-    return (
-      <div className="min-h-screen bg-amber-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto"></div>
-          <p className="mt-4 text-amber-700">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-amber-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Login Splash Screen */}
       {showLoginSplash && !isAuthenticated && (
         <div className="fixed inset-0 bg-white z-50 flex items-center justify-center p-4">
@@ -513,11 +520,11 @@ export default function AppPage() {
               </p>
             </div>
 
-            <div className="bg-amber-50 rounded-lg p-6 mb-8">
-              <h2 className="text-xl font-bold text-amber-900 mb-4">
+            <div className="bg-slate-50 rounded-lg p-6 mb-8">
+              <h2 className="text-xl font-bold text-slate-900 mb-4">
                 Save Your Work!
               </h2>
-              <p className="text-amber-700 mb-6">
+              <p className="text-slate-700 mb-6">
                 Your guest session has ended. Export your backup to save your
                 work, or login for automatic saving.
               </p>
@@ -525,26 +532,26 @@ export default function AppPage() {
               <div className="space-y-4">
                 <button
                   onClick={handleExportBackupWrapper}
-                  className="w-full py-3 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition shadow-md hover:shadow-lg"
+                  className="w-full py-3 bg-gradient-to-r from-purple-500 to-blue-500 hover:shadow-lg text-white font-medium rounded-lg transition shadow-md"
                 >
                   📥 Export Backup & Save Work
                 </button>
 
                 <SignInButton mode="modal">
-                  <button className="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-medium rounded-lg transition shadow-md hover:shadow-lg">
+                  <button className="w-full py-3 bg-gradient-to-r from-purple-500 to-blue-500 hover:shadow-lg text-white font-medium rounded-lg transition shadow-md">
                     🔐 Login for Auto-Save
                   </button>
                 </SignInButton>
 
                 <button
                   onClick={handleContinueAsGuest}
-                  className="w-full py-3 border border-amber-500 text-amber-700 hover:bg-amber-50 font-medium rounded-lg transition"
+                  className="w-full py-3 border border-slate-500 text-slate-700 hover:bg-slate-50 font-medium rounded-lg transition"
                 >
                   ⚠️ Continue as Guest (Unsaved)
                 </button>
               </div>
 
-              <p className="text-sm text-amber-600 mt-4">
+              <p className="text-sm text-slate-600 mt-4">
                 Don't have an account? Sign up for free
               </p>
             </div>
@@ -565,9 +572,9 @@ export default function AppPage() {
                 <img
                   src="/Dragon logo1.png"
                   alt="Veltrian Logo"
-                  className="w-8 h-7 object-contain -mr-2"
+                  className="w-10 h-9 object-contain -mr-2"
                 />
-                <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent pt-0.5">
+                <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent pt-0.5">
                   eltrian
                 </span>
               </div>
@@ -575,11 +582,11 @@ export default function AppPage() {
 
             {isAuthenticated ? (
               <div className="flex items-center space-x-4">
-                <span className="text-sm font-medium text-amber-800">
+                <span className="text-sm font-medium text-slate-800">
                   Hello, {user?.firstName || user?.email || "User"}!
                 </span>
                 <SignOutButton>
-                  <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-amber-900 bg-amber-200 hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500">
+                  <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-purple-500 to-blue-500 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
                     Logout
                   </button>
                 </SignOutButton>
@@ -587,12 +594,12 @@ export default function AppPage() {
             ) : (
               <div className="flex items-center space-x-4">
                 {extendedGuestMode && (
-                  <div className="flex items-center space-x-2 text-sm text-amber-700 bg-amber-100 px-3 py-1 rounded-full">
+                  <div className="flex items-center space-x-2 text-sm text-slate-700 bg-slate-100 px-3 py-1 rounded-full">
                     <span>⚠️ Export Backup to Save Work</span>
                   </div>
                 )}
                 <SignInButton mode="modal">
-                  <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-amber-900 bg-amber-200 hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500">
+                  <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-purple-500 to-blue-500 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
                     Login to Save
                   </button>
                 </SignInButton>
@@ -606,7 +613,7 @@ export default function AppPage() {
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         {/* Extended Guest Mode Warning */}
         {extendedGuestMode && !isAuthenticated && (
-          <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-yellow-700">
+          <div className="mb-6 bg-slate-50 border border-slate-200 rounded-lg p-4 text-slate-700">
             <div className="flex items-center">
               <span className="text-lg mr-2">⚠️</span>
               <div>
@@ -622,16 +629,16 @@ export default function AppPage() {
 
         {/* Upload Progress Bar */}
         {isUploading && (
-          <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="mb-6 bg-slate-50 border border-slate-200 rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-blue-700">
+              <span className="text-sm font-medium text-slate-700">
                 Uploading {currentUploadFile || "file"}...
               </span>
-              <span className="text-sm text-blue-600">{uploadProgress}%</span>
+              <span className="text-sm text-slate-600">{uploadProgress}%</span>
             </div>
-            <div className="w-full bg-blue-200 rounded-full h-2">
+            <div className="w-full bg-slate-200 rounded-full h-2">
               <div
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                className="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${uploadProgress}%` }}
               ></div>
             </div>
@@ -652,10 +659,10 @@ export default function AppPage() {
 
         <div className="mb-8">
           <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold text-amber-900">
+            <h2 className="text-2xl font-bold text-slate-900">
               Your Files ({files.length})
               {extendedGuestMode && !isAuthenticated && (
-                <span className="text-sm font-normal text-yellow-600 ml-2">
+                <span className="text-sm font-normal text-slate-600 ml-2">
                   (Temporary - Export to Save)
                 </span>
               )}
@@ -664,14 +671,14 @@ export default function AppPage() {
               <button
                 onClick={handleExportBackupWrapper}
                 disabled={isLoading || (isAuthenticated && !encryptionKey)}
-                className="inline-flex items-center px-4 py-2 border border-amber-300 text-sm font-medium rounded-md text-amber-800 bg-amber-100 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50"
+                className="inline-flex items-center px-4 py-2 border border-slate-300 text-sm font-medium rounded-md text-slate-800 bg-slate-100 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 disabled:opacity-50"
               >
                 {!isAuthenticated
                   ? "📥 Export Backup to Save"
                   : "Export Backup"}
               </button>
               <label
-                className={`inline-flex items-center px-4 py-2 border border-amber-300 text-sm font-medium rounded-md text-amber-800 bg-amber-100 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 ${isLoading || !isAuthenticated || (isAuthenticated && !encryptionKey) ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+                className={`inline-flex items-center px-4 py-2 border border-slate-300 text-sm font-medium rounded-md text-slate-800 bg-slate-100 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 ${isLoading || !isAuthenticated || (isAuthenticated && !encryptionKey) ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
               >
                 Import Backup
                 <input
