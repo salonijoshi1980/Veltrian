@@ -69,17 +69,16 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-3 flex justify-between items-center">
           {/* Logo */}
           {/* Logo */}
-<div className="flex items-center">
-  <img
-    src="/Dragon logo1.png"
-    alt="Veltrian Logo"
-    className="w-14 h-12 md:w-20 md:h-16 object-contain"
-  />
-  <span className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent ">
-    eltrian
-  </span>
-</div>
-
+          <div className="flex items-center">
+            <img
+              src="/Dragon logo1.png"
+              alt="Veltrian Logo"
+              className="w-14 h-12 md:w-20 md:h-16 object-contain -mr-4"
+            />
+            <span className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent ">
+              eltrian
+            </span>
+          </div>
 
           {/* Button */}
           <button
@@ -112,31 +111,30 @@ export default function HomePage() {
         </div>
 
         {/* Email Input */}
-       <div
-  className={`w-full max-w-md transition-all duration-1000 delay-300 transform ${
-    isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
-  }`}
->
-  <div className="flex flex-col sm:flex-row overflow-hidden rounded-2xl border border-slate-300 bg-white shadow-sm focus-within:ring-2 focus-within:ring-purple-500">
-    <input
-      type="email"
-      placeholder="Enter your email..."
-      value={email}
-      onChange={(e) => setEmail(e.target.value)}
-      className="flex-1 px-4 py-3 text-slate-700 focus:outline-none text-sm sm:text-base"
-    />
-    <button
-      onClick={openEmailModal}
-      className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-5 py-3 font-semibold hover:shadow-lg transition-shadow rounded-b-2xl sm:rounded-b-none sm:rounded-r-2xl mt-3 sm:mt-0"
-    >
-      Get Started
-    </button>
-  </div>
-  <p className="text-slate-500 text-xs sm:text-sm mt-3">
-    By entering your email, you agree to receive updates from Veltrian.
-  </p>
-</div>
-
+        <div
+          className={`w-full max-w-md transition-all duration-1000 delay-300 transform ${
+            isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+          }`}
+        >
+          <div className="flex flex-col sm:flex-row overflow-hidden rounded-2xl border border-slate-300 bg-white shadow-sm focus-within:ring-2 focus-within:ring-purple-500">
+            <input
+              type="email"
+              placeholder="Enter your email..."
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="flex-1 px-4 py-3 text-slate-700 focus:outline-none text-sm sm:text-base"
+            />
+            <button
+              onClick={openEmailModal}
+              className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-5 py-3 font-semibold hover:shadow-lg transition-shadow rounded-b-2xl sm:rounded-b-none sm:rounded-r-2xl mt-3 sm:mt-0"
+            >
+              Get Started
+            </button>
+          </div>
+          <p className="text-slate-500 text-xs sm:text-sm mt-3">
+            By entering your email, you agree to receive updates from Veltrian.
+          </p>
+        </div>
 
         {/* Stats Section */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mt-10 sm:mt-16 w-full max-w-4xl">
@@ -144,7 +142,9 @@ export default function HomePage() {
             <div
               key={index}
               className={`bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200 transition-all duration-500 transform ${
-                isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+                isVisible
+                  ? "translate-y-0 opacity-100"
+                  : "translate-y-10 opacity-0"
               }`}
             >
               <div className="text-xl sm:text-2xl font-bold text-slate-800 mb-1 sm:mb-2">
@@ -176,7 +176,7 @@ export default function HomePage() {
                     strokeWidth="2"
                     d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                   />
-                )
+                ),
               },
               {
                 title: "Encrypted Storage",
@@ -188,7 +188,7 @@ export default function HomePage() {
                     strokeWidth="2"
                     d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
                   />
-                )
+                ),
               },
               {
                 title: "Private Access",
@@ -200,10 +200,13 @@ export default function HomePage() {
                     strokeWidth="2"
                     d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
                   />
-                )
-              }
+                ),
+              },
             ].map((step, i) => (
-              <div key={i} className="text-center p-4 sm:p-6 hover:scale-105 transition-transform">
+              <div
+                key={i}
+                className="text-center p-4 sm:p-6 hover:scale-105 transition-transform"
+              >
                 <div className="bg-blue-100 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg
                     className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600"
@@ -248,7 +251,9 @@ export default function HomePage() {
             </p>
 
             {submitMessage ? (
-              <div className="text-center py-4 text-gray-700">{submitMessage}</div>
+              <div className="text-center py-4 text-gray-700">
+                {submitMessage}
+              </div>
             ) : (
               <form onSubmit={handleEmailSubmit}>
                 <input

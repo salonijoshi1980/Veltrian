@@ -16,15 +16,162 @@ import {
 } from "@/utils/crypto";
 
 export function useFileOperations(encryptionKey) {
-  const loadFiles = useCallback(async (setFiles, setError) => {
-    try {
-      const fileList = await getAllFiles();
-      setFiles(fileList);
-    } catch (err) {
-      console.error("Error loading files:", err);
-      if (setError) setError("Failed to load files");
-    }
-  }, []);
+  const loadFiles = useCallback(
+    async (setFiles, setError, showUnencryptedOnly = false) => {
+      try {
+        const fileList = await getAllFiles();
+
+        // Filter files based on user status:
+        // - When not logged in (guest): show only unencrypted files
+        // - When logged in with encryption: show all files
+        const filteredFiles = showUnencryptedOnly
+          ? fileList.filter((file) => file.encrypted === false)
+          : fileList;
+
+        setFiles(filteredFiles);
+      } catch (err) {
+        console.error("Error loading files:", err);
+        if (setError) setError("Failed to load files");
+      }
+    },
+    []
+  );
+
+  // Function to re-encrypt existing unencrypted files by converting back to file and re-uploading
+  const reEncryptUnencryptedFiles = useCallback(
+    async (setSuccess, setError, encryptionKeyParam) => {
+      // Use the passed encryption key or fallback to the hook's encryptionKey
+      const keyToUse = encryptionKeyParam || encryptionKey;
+
+      console.log(
+        "reEncryptUnencryptedFiles called with keyToUse:",
+        !!keyToUse
+      );
+
+      if (!keyToUse) {
+        console.log("No encryption key available, skipping re-encryption");
+        return;
+      }
+
+      try {
+        const allFiles = await getAllFiles();
+        console.log("All files:", allFiles);
+        const unencryptedFiles = allFiles.filter(
+          (file) => file.encrypted === false
+        );
+        console.log("Unencrypted files found:", unencryptedFiles.length);
+
+        if (unencryptedFiles.length === 0) {
+          console.log("No unencrypted files to re-encrypt");
+          return;
+        }
+
+        let reEncryptedCount = 0;
+
+        for (const file of unencryptedFiles) {
+          try {
+            console.log("Re-encrypting file:", file.name);
+            // Get all chunks for this file
+            const chunks = await getFileChunks(file.id);
+            console.log(`File ${file.name} has ${chunks.length} chunks`);
+
+            // Reconstruct the original file from unencrypted chunks
+            const decryptedChunks = [];
+            for (const chunk of chunks) {
+              if (!chunk.encrypted && chunk.data) {
+                // Convert stored array back to Uint8Array
+                const dataArray = new Uint8Array(chunk.data);
+                decryptedChunks.push(dataArray);
+              }
+            }
+
+            // Reconstruct the file
+            const reconstructedFile = reconstructFile(
+              decryptedChunks,
+              file.mimeType
+            );
+
+            // Create a proper File object (not just a Blob) to work with chunkFile
+            // We can't directly set properties on Blob, so we create a new File
+            const fileForChunking = new File([reconstructedFile], file.name, {
+              type: file.mimeType,
+              lastModified: new Date(file.createdAt).getTime(),
+            });
+
+            console.log("File reconstructed successfully");
+
+            // Chunk the file again
+            const fileChunks = await chunkFile(fileForChunking);
+            console.log("File re-chunked:", fileChunks.length, "chunks");
+
+            // Save new file metadata with encryption flag set to true
+            const newFileMetadata = {
+              name: file.name,
+              size: file.size,
+              mimeType: file.mimeType,
+              createdAt: file.createdAt, // Keep original creation time
+              totalChunks: fileChunks.length,
+              encrypted: true, // Mark as encrypted
+            };
+
+            const newFileId = await saveFileMetadata(newFileMetadata);
+            console.log("New file metadata saved with ID:", newFileId);
+
+            // Process each chunk - encrypt with the encryption key
+            for (
+              let chunkIndex = 0;
+              chunkIndex < fileChunks.length;
+              chunkIndex++
+            ) {
+              const chunkData = fileChunks[chunkIndex];
+
+              // Encrypt chunk
+              const { iv, ciphertext } = await encryptChunk(
+                chunkData,
+                keyToUse
+              );
+
+              const encryptedChunkData = {
+                fileId: newFileId,
+                chunkIndex,
+                iv,
+                ciphertext,
+                encrypted: true,
+              };
+
+              await saveChunk(encryptedChunkData);
+              console.log("Encrypted chunk", chunkIndex, "saved");
+            }
+
+            // Delete the old unencrypted file and its chunks
+            await deleteFile(file.id);
+            console.log("Old unencrypted file deleted:", file.id);
+
+            reEncryptedCount++;
+            console.log(`Re-encrypted file ${file.name}`);
+          } catch (fileError) {
+            console.error(
+              `Error re-encrypting file ${file.name} (ID: ${file.id}):`,
+              fileError
+            );
+            // Continue with other files even if one fails
+          }
+        }
+
+        if (reEncryptedCount > 0) {
+          const message = `Re-encrypted ${reEncryptedCount} file(s)!`;
+          console.log(message);
+          setSuccess(message);
+        } else {
+          console.log("No files were successfully re-encrypted");
+        }
+      } catch (err) {
+        console.error("Error re-encrypting files:", err);
+        setError("Failed to re-encrypt existing files");
+      }
+    },
+    [encryptionKey]
+  );
 
   const handleFileUpload = useCallback(
     async (
@@ -74,7 +221,7 @@ export function useFileOperations(encryptionKey) {
             chunkIndex++
           ) {
             let chunkData;
-            
+
             if (encryptionKey) {
               // Encrypt chunk for authenticated users
               const { iv, ciphertext } = await encryptChunk(
@@ -143,7 +290,7 @@ export function useFileOperations(encryptionKey) {
 
         for (const chunk of chunks) {
           let decrypted;
-          
+
           if (chunk.encrypted && encryptionKey) {
             // Decrypt encrypted chunks
             decrypted = await decryptChunk(
@@ -157,7 +304,7 @@ export function useFileOperations(encryptionKey) {
           } else {
             throw new Error("Invalid chunk data");
           }
-          
+
           decryptedChunks.push(decrypted);
         }
 
@@ -212,7 +359,7 @@ export function useFileOperations(encryptionKey) {
 
         for (const chunk of chunks) {
           let decrypted;
-          
+
           if (chunk.encrypted && encryptionKey) {
             decrypted = await decryptChunk(
               chunk.iv,
@@ -224,7 +371,7 @@ export function useFileOperations(encryptionKey) {
           } else {
             throw new Error("Invalid chunk data");
           }
-          
+
           decryptedChunks.push(decrypted);
         }
 
@@ -319,5 +466,6 @@ export function useFileOperations(encryptionKey) {
     handleExportFile,
     handleExportBackup,
     handleImportBackup,
+    reEncryptUnencryptedFiles,
   };
 }

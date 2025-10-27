@@ -16,16 +16,18 @@ export default function PassphraseSetupModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full border border-amber-200">
+      <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full border border-slate-200">
         <div className="flex items-center justify-center mb-6">
           <img
-            src="/src/__create/favicon.png"
-            alt="Veltrain Logo"
-            className="h-20 w-20 mr-3"
+            src="/Dragon logo1.png"
+            alt="Veltrian Logo"
+            className="w-10 h-9 object-contain -mr-2"
           />
-          <h2 className="text-2xl font-bold text-amber-900">Veltrain</h2>
+          <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent pt-0.5">
+            eltrian
+          </span>
         </div>
-        <p className="text-amber-700 mb-6">
+        <p className="text-slate-700 mb-6">
           Enter a strong passphrase to encrypt your files
         </p>
 
@@ -33,7 +35,7 @@ export default function PassphraseSetupModal({
           <div>
             <label
               htmlFor="passphrase"
-              className="block text-sm font-medium text-amber-800 mb-2"
+              className="block text-sm font-medium text-slate-800 mb-2"
             >
               Encryption Passphrase
             </label>
@@ -43,7 +45,7 @@ export default function PassphraseSetupModal({
               value={passphrase}
               onChange={(e) => setPassphrase(e.target.value)}
               placeholder="Enter a strong passphrase"
-              className="w-full px-4 py-2 border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none"
+              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
               disabled={isLoading}
             />
             {error && <div className="mt-2 text-sm text-red-600">{error}</div>}
@@ -52,13 +54,13 @@ export default function PassphraseSetupModal({
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-amber-500 hover:bg-amber-600 disabled:bg-amber-300 text-amber-900 font-medium py-2 rounded-lg transition"
+            className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:shadow-lg text-white font-medium py-2 rounded-lg transition disabled:opacity-50"
           >
             {isLoading ? "Setting up..." : "Continue"}
           </button>
         </form>
 
-        <div className="mt-6 pt-6 border-t border-amber-200 text-center text-xs text-amber-600">
+        <div className="mt-6 pt-6 border-t border-slate-200 text-center text-xs text-slate-600">
           <p>🔒 Your passphrase is never stored or sent anywhere</p>
         </div>
       </div>

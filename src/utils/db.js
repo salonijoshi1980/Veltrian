@@ -69,6 +69,23 @@ export async function saveFileMetadata(fileMetadata) {
 }
 
 /**
+ * Update file metadata in IndexedDB
+ * @param {Object} fileMetadata - File metadata object with id
+ * @returns {Promise<number>} - The file ID
+ */
+export async function updateFileMetadata(fileMetadata) {
+  const db = await initDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([STORE_FILES], "readwrite");
+    const store = transaction.objectStore(STORE_FILES);
+    const request = store.put(fileMetadata);
+
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+/**
  * Save encrypted chunk to IndexedDB
  * @param {Object} chunkData - Chunk data object
  * @returns {Promise<number>} - The chunk ID
@@ -78,7 +95,8 @@ export async function saveChunk(chunkData) {
   return new Promise((resolve, reject) => {
     const transaction = db.transaction([STORE_CHUNKS], "readwrite");
     const store = transaction.objectStore(STORE_CHUNKS);
-    const request = store.add(chunkData);
+    // Use put() instead of add() to update existing chunks
+    const request = store.put(chunkData);
 
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);

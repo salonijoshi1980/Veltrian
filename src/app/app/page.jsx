@@ -50,10 +50,10 @@ export default function AppPage() {
   const { formatFileSize, formatDate } = useFormatting();
 
   // Guest access management
-  const GUEST_ACCESS_KEY = 'veltrain_guest_access';
-  const GUEST_FIRST_VISIT_KEY = 'veltrain_first_visit';
-  const EXTENDED_GUEST_KEY = 'veltrain_extended_guest';
-  const GUEST_BACKUP_REMINDER_KEY = 'veltrain_guest_backup_reminder';
+  const GUEST_ACCESS_KEY = "veltrain_guest_access";
+  const GUEST_FIRST_VISIT_KEY = "veltrain_first_visit";
+  const EXTENDED_GUEST_KEY = "veltrain_extended_guest";
+  const GUEST_BACKUP_REMINDER_KEY = "veltrain_guest_backup_reminder";
 
   // Initialize
   useEffect(() => {
@@ -62,13 +62,13 @@ export default function AppPage() {
 
   // Check extended guest mode
   const isExtendedGuestMode = () => {
-    return localStorage.getItem(EXTENDED_GUEST_KEY) === 'true';
+    return localStorage.getItem(EXTENDED_GUEST_KEY) === "true";
   };
 
   // Set extended guest mode
   const setExtendedGuestModeFlag = (value) => {
     if (value) {
-      localStorage.setItem(EXTENDED_GUEST_KEY, 'true');
+      localStorage.setItem(EXTENDED_GUEST_KEY, "true");
     } else {
       localStorage.removeItem(EXTENDED_GUEST_KEY);
     }
@@ -89,7 +89,7 @@ export default function AppPage() {
     const data = {
       expiresAt,
       usageCount,
-      createdAt: Date.now()
+      createdAt: Date.now(),
     };
     localStorage.setItem(GUEST_ACCESS_KEY, JSON.stringify(data));
   };
@@ -103,7 +103,7 @@ export default function AppPage() {
   const hasGuestAccessExpired = () => {
     const data = getGuestAccessData();
     if (!data) return false;
-    
+
     const now = Date.now();
     return now > data.expiresAt;
   };
@@ -113,11 +113,19 @@ export default function AppPage() {
     if (!isAuthenticated) {
       try {
         // Clear all files for guest users
-        const currentFiles = await guestFileOperations.loadFiles(setFiles, setError);
+        const currentFiles = await guestFileOperations.loadFiles(
+          setFiles,
+          setError
+        );
         if (currentFiles && currentFiles.length > 0) {
           // Delete all guest files
           for (const file of currentFiles) {
-            await guestFileOperations.handleDelete(file.id, setSuccess, setError, () => {});
+            await guestFileOperations.handleDelete(
+              file.id,
+              setSuccess,
+              setError,
+              () => {}
+            );
           }
         }
         setFiles([]);
@@ -147,10 +155,10 @@ export default function AppPage() {
       }
 
       const guestData = getGuestAccessData();
-      
+
       if (!guestData) {
         // First visit - grant 2 minutes access
-        const expiresAt = Date.now() + (2 * 60 * 1000);
+        const expiresAt = Date.now() + 2 * 60 * 1000;
         setGuestAccessData(expiresAt, 0);
         setGuestAccessActive(true);
         startGuestAccessTimer();
@@ -197,7 +205,7 @@ export default function AppPage() {
     if (!guestData) return;
 
     const timeLeft = guestData.expiresAt - Date.now();
-    
+
     if (timeLeft <= 0) {
       setShowLoginSplash(true);
       setGuestAccessActive(false);
@@ -218,8 +226,10 @@ export default function AppPage() {
     setExtendedGuestModeFlag(true);
     setShowLoginSplash(false);
     setGuestAccessActive(true);
-    setError("You're in extended guest mode. Export your backup to save your work - it will be lost when you leave!");
-    
+    setError(
+      "You're in extended guest mode. Export your backup to save your work - it will be lost when you leave!"
+    );
+
     // Clear the error after 5 seconds
     setTimeout(() => setError(""), 5000);
   };
@@ -234,7 +244,8 @@ export default function AppPage() {
   // Load guest files (without encryption)
   const loadGuestFiles = () => {
     if (!isAuthenticated) {
-      guestFileOperations.loadFiles(setFiles, setError);
+      // Show only unencrypted files for guest users
+      guestFileOperations.loadFiles(setFiles, setError, true);
     }
   };
 
@@ -251,7 +262,8 @@ export default function AppPage() {
   // Load files from IndexedDB when authentication or encryption changes
   useEffect(() => {
     if (isAuthenticated && isLoaded && encryptionKey) {
-      authFileOperations.loadFiles(setFiles, setError);
+      // Show all files for authenticated users with encryption
+      authFileOperations.loadFiles(setFiles, setError, false);
     } else if (!isAuthenticated) {
       loadGuestFiles();
     }
@@ -269,10 +281,25 @@ export default function AppPage() {
         return;
       }
 
+      console.log("Deriving encryption key...");
       const key = await deriveKey(passphrase);
+      console.log("Encryption key derived successfully");
+
       setEncryptionKey(key);
       setShowPassphraseSetup(false);
       setSuccess("Encryption key set successfully!");
+
+      console.log("Calling reEncryptUnencryptedFiles with key...");
+      // Re-encrypt any existing unencrypted files, passing the key directly
+      await authFileOperations.reEncryptUnencryptedFiles(
+        setSuccess,
+        setError,
+        key
+      );
+      console.log("reEncryptUnencryptedFiles completed");
+
+      // Reload files to show updated encryption status
+      await authFileOperations.loadFiles(setFiles, setError);
 
       sessionStorage.setItem("encryptionKeySet", "true");
       setTimeout(() => setSuccess(""), 3000);
@@ -310,14 +337,16 @@ export default function AppPage() {
   const handleFileUploadWrapper = (files) => {
     // Check if we're in extended guest mode and show warning
     if (!isAuthenticated && extendedGuestMode) {
-      setError("⚠️ Guest Mode: Export your backup to save your work. Files will be lost when you leave!");
+      setError(
+        "⚠️ Guest Mode: Export your backup to save your work. Files will be lost when you leave!"
+      );
       setTimeout(() => setError(""), 7000);
     }
 
     resetGuestTimer();
 
     const fileOps = isAuthenticated ? authFileOperations : guestFileOperations;
-    
+
     if (isAuthenticated && !encryptionKey) {
       setError("Please set up your encryption passphrase first");
       return;
@@ -352,7 +381,7 @@ export default function AppPage() {
     resetGuestTimer();
 
     const fileOps = isAuthenticated ? authFileOperations : guestFileOperations;
-    
+
     if (isAuthenticated && !encryptionKey) {
       setError("Please set up your encryption passphrase first");
       return;
@@ -364,14 +393,16 @@ export default function AppPage() {
   const handleImportBackupWrapper = (e) => {
     // Only allow import for authenticated users
     if (!isAuthenticated) {
-      setError("Please login to import backups. Guest users can only export their work.");
+      setError(
+        "Please login to import backups. Guest users can only export their work."
+      );
       return;
     }
 
     resetGuestTimer();
 
     const fileOps = isAuthenticated ? authFileOperations : guestFileOperations;
-    
+
     if (isAuthenticated && !encryptionKey) {
       setError("Please set up your encryption passphrase first");
       return;
@@ -398,7 +429,7 @@ export default function AppPage() {
     resetGuestTimer();
 
     const fileOps = isAuthenticated ? authFileOperations : guestFileOperations;
-    
+
     if (isAuthenticated && !encryptionKey) {
       setError("Please set up your encryption passphrase first");
       return;
@@ -417,7 +448,7 @@ export default function AppPage() {
     resetGuestTimer();
 
     const fileOps = isAuthenticated ? authFileOperations : guestFileOperations;
-    
+
     fileOps.handleExportFile(file, setSuccess, setError, setIsLoading);
   };
 
@@ -425,7 +456,7 @@ export default function AppPage() {
     resetGuestTimer();
 
     const fileOps = isAuthenticated ? authFileOperations : guestFileOperations;
-    
+
     if (isAuthenticated && !encryptionKey) {
       setError("Please set up your encryption passphrase first");
       return;
@@ -467,13 +498,19 @@ export default function AppPage() {
         <div className="fixed inset-0 bg-white z-50 flex items-center justify-center p-4">
           <div className="max-w-md w-full text-center">
             <div className="mb-8">
-              <img
-                src="/src/__create/favicon.png"
-                alt="Veltrain Logo"
-                className="h-16 w-16 mx-auto mb-4"
-              />
-              <h1 className="text-3xl font-bold text-amber-700 mb-2">Veltrain</h1>
-              <p className="text-gray-600">Your private file intelligence workspace</p>
+              <div className="flex items-center justify-center">
+                <img
+                  src="/Dragon logo1.png"
+                  alt="Veltrian Logo"
+                  className="w-16 h-16 object-contain -mr-4"
+                />
+                <span className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent pt-1">
+                  eltrian
+                </span>
+              </div>
+              <p className="text-gray-600">
+                Your private file intelligence workspace
+              </p>
             </div>
 
             <div className="bg-amber-50 rounded-lg p-6 mb-8">
@@ -481,9 +518,10 @@ export default function AppPage() {
                 Save Your Work!
               </h2>
               <p className="text-amber-700 mb-6">
-                Your guest session has ended. Export your backup to save your work, or login for automatic saving.
+                Your guest session has ended. Export your backup to save your
+                work, or login for automatic saving.
               </p>
-              
+
               <div className="space-y-4">
                 <button
                   onClick={handleExportBackupWrapper}
@@ -491,13 +529,13 @@ export default function AppPage() {
                 >
                   📥 Export Backup & Save Work
                 </button>
-                
+
                 <SignInButton mode="modal">
                   <button className="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-medium rounded-lg transition shadow-md hover:shadow-lg">
                     🔐 Login for Auto-Save
                   </button>
                 </SignInButton>
-                
+
                 <button
                   onClick={handleContinueAsGuest}
                   className="w-full py-3 border border-amber-500 text-amber-700 hover:bg-amber-50 font-medium rounded-lg transition"
@@ -505,7 +543,7 @@ export default function AppPage() {
                   ⚠️ Continue as Guest (Unsaved)
                 </button>
               </div>
-              
+
               <p className="text-sm text-amber-600 mt-4">
                 Don't have an account? Sign up for free
               </p>
@@ -522,15 +560,19 @@ export default function AppPage() {
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
-            <div className="flex items-center space-x-3">
-              <img
-                src="/src/__create/favicon.png"
-                alt="Veltrain Logo"
-                className="h-8 w-8"
-              />
-              <h1 className="text-xl font-bold text-amber-700">Veltrain</h1>
+            <div className="flex items-center">
+              <div className="flex items-center">
+                <img
+                  src="/Dragon logo1.png"
+                  alt="Veltrian Logo"
+                  className="w-8 h-7 object-contain -mr-2"
+                />
+                <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent pt-0.5">
+                  eltrian
+                </span>
+              </div>
             </div>
-            
+
             {isAuthenticated ? (
               <div className="flex items-center space-x-4">
                 <span className="text-sm font-medium text-amber-800">
@@ -569,7 +611,10 @@ export default function AppPage() {
               <span className="text-lg mr-2">⚠️</span>
               <div>
                 <p className="font-medium">Guest Mode - Export Your Backup!</p>
-                <p className="text-sm">Your work will be lost when you leave. Export your backup to save it permanently.</p>
+                <p className="text-sm">
+                  Your work will be lost when you leave. Export your backup to
+                  save it permanently.
+                </p>
               </div>
             </div>
           </div>
@@ -610,7 +655,9 @@ export default function AppPage() {
             <h2 className="text-2xl font-bold text-amber-900">
               Your Files ({files.length})
               {extendedGuestMode && !isAuthenticated && (
-                <span className="text-sm font-normal text-yellow-600 ml-2">(Temporary - Export to Save)</span>
+                <span className="text-sm font-normal text-yellow-600 ml-2">
+                  (Temporary - Export to Save)
+                </span>
               )}
             </h2>
             <div className="flex space-x-2">
@@ -619,9 +666,13 @@ export default function AppPage() {
                 disabled={isLoading || (isAuthenticated && !encryptionKey)}
                 className="inline-flex items-center px-4 py-2 border border-amber-300 text-sm font-medium rounded-md text-amber-800 bg-amber-100 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50"
               >
-                {!isAuthenticated ? "📥 Export Backup to Save" : "Export Backup"}
+                {!isAuthenticated
+                  ? "📥 Export Backup to Save"
+                  : "Export Backup"}
               </button>
-              <label className={`inline-flex items-center px-4 py-2 border border-amber-300 text-sm font-medium rounded-md text-amber-800 bg-amber-100 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 ${(isLoading || !isAuthenticated || (isAuthenticated && !encryptionKey)) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+              <label
+                className={`inline-flex items-center px-4 py-2 border border-amber-300 text-sm font-medium rounded-md text-amber-800 bg-amber-100 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 ${isLoading || !isAuthenticated || (isAuthenticated && !encryptionKey) ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+              >
                 Import Backup
                 <input
                   type="file"
@@ -629,7 +680,11 @@ export default function AppPage() {
                   onChange={handleImportBackupWrapper}
                   accept=".backup,.json"
                   className="hidden"
-                  disabled={isLoading || !isAuthenticated || (isAuthenticated && !encryptionKey)}
+                  disabled={
+                    isLoading ||
+                    !isAuthenticated ||
+                    (isAuthenticated && !encryptionKey)
+                  }
                 />
               </label>
             </div>
