@@ -105,6 +105,13 @@ You can check current issues like:
 - Creating PR Templates
 - Enhancing UI and documentation
 
+## 🤝 Contributing
+
+We welcome contributions from the community!  
+Please read our [Contribution Guidelines.md](./CONTRIBUTING.md) for detailed guidelines on how to create issues, submit pull requests, and maintain code quality.
+
+If you find issues or want to add features, check existing issues or open new ones. Every contribution counts! 💙
+
 ---
 
 ## 📊 Community Validation
