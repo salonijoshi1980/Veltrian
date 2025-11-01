@@ -1,166 +1,200 @@
-# Veltrian
+# 🚀 Privanode by Veltrian
+> **Your data. Your node. Your control.**
 
-A modern web application built with React, Vite, and React Router.
+A **privacy-first storage platform** — no cloud, no server, no data leaks.
+Currently building the **first user-driven version** with insights from **18+ real users** and a growing open-source community.
 
-## Tech Stack
+<br/>
+  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png"/>
+<br/>
 
-- **Frontend Framework**: React 18
-- **Routing**: React Router v7
-- **Build Tool**: Vite v6
-- **Styling**: Tailwind CSS v3
-- **Authentication**: Clerk
-- **State Management**: Zustand
-- **Data Fetching**: TanStack Query (React Query)
-- **UI Components**: Chakra UI, Lucide React icons
-- **Charts**: Recharts
-- **Testing**: Vitest (unit), Cypress (E2E)
+<div align="center">
+  <table align="center">
+    <thead align="center">
+      <tr>
+        <td><b>🌟 Stars</b></td>
+        <td><b>🍴 Forks</b></td>
+        <td><b>🐛 Issues</b></td>
+        <td><b>🔔 Open PRs</b></td>
+        <td><b>🔕 Closed PRs</b></td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><img alt="Stars" src="https://img.shields.io/github/stars/YOUR_ORG_OR_USER/Privanode?style=flat&logo=github" /></td>
+        <td><img alt="Forks" src="https://img.shields.io/github/forks/YOUR_ORG_OR_USER/Privanode?style=flat&logo=github" /></td>
+        <td><img alt="Issues" src="https://img.shields.io/github/issues/YOUR_ORG_OR_USER/Privanode?style=flat&logo=github" /></td>
+        <td><img alt="Open PRs" src="https://img.shields.io/github/issues-pr/YOUR_ORG_OR_USER/Privanode?style=flat&logo=github" /></td>
+        <td><img alt="Closed PRs" src="https://img.shields.io/github/issues-pr-closed/YOUR_ORG_OR_USER/Privanode?style=flat&color=critical&logo=github" /></td>
+      </tr>
+    </tbody>
+  </table>
 
-## Getting Started
+  <!-- Tech stack badges -->
+  ![React](https://img.shields.io/badge/React-18-blue?style=for-the-badge&logo=react)
+  ![Vite](https://img.shields.io/badge/Vite-6-yellow?style=for-the-badge&logo=vite)
+  ![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-3-38b2ac?style=for-the-badge&logo=tailwindcss)
+  ![ChakraUI](https://img.shields.io/badge/ChakraUI-v2-63B3ED?style=for-the-badge&logo=chakraui)
+  ![Clerk](https://img.shields.io/badge/Clerk-auth-green?style=for-the-badge&logo=clerk)
+  ![Open Source](https://img.shields.io/badge/Open%20Source-blueviolet?style=for-the-badge&logo=github)
 
-### Prerequisites
+</div>
 
-- Node.js (version 18 or higher)
-- npm package manager
 
-### Installation
+## 📑 Table of Contents
+1. [🧠 What We’re Solving](#-what-were-solving)
+2. [🧩 Current Progress](#-current-progress)
+3. [⚙️ Tech Stack](#️-tech-stack)
+4. [💡 How You Can Contribute](#-how-you-can-contribute)
+5. [📊 Community Validation](#-community-validation)
+6. [❤️ Contributors](#-contributors)
+7. [🔍 FAQ](#-faq)
+8. [📬 Connect](#-connect)
+9. [🌈 License](#-license)
 
-1. Clone the repository:
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png"/>
 
-   ```bash
-   git clone <repository-url>
-   ```
+## 🧠 What We’re Solving
 
-2. Navigate to the project directory:
+Most storage platforms depend on **cloud or centralized servers** —
+causing **data leaks, storage limits, complex setups** (credit cards, tokens, API keys, etc.).
+**Privanode** eliminates that by enabling **peer-based local storage**,
+where users can store, visualize, and control their own data securely and independently.
 
-   ```bash
-   cd veltrian
-   ```
+---
 
-3. Install dependencies:
+## 🧩 Current Progress
 
-   ```bash
-   npm install
-   ```
+- 🧑‍💻 Built **first MVP (core feature live)**
+- 📊 **18+ user survey responses** in just 2 days
+- 💬 Refining setup flow & UI based on real feedback
+- 🧑‍🎓 Balancing **college exams** and **product development**
+- 🌍 Built with help from **10+ open-source contributors**
 
-4. Install React Router:
+---
 
-   ```bash
-   npm install react-router
-   ```
+## ⚙️ Tech Stack
 
-5. Create a `.env` file based on `.env.example`:
+| Category                 | Technology                         |
+|--------------------------|------------------------------------|
+| **Frontend Framework**   | React 18 + Vite v6                 |
+| **Routing**              | React Router v7                    |
+| **Styling**              | Tailwind CSS v3 + Chakra UI        |
+| **State Management**     | Zustand                            |
+| **Data Fetching**        | TanStack Query (React Query)       |
+| **Authentication**       | Clerk                              |
+| **Charts & Visualization**| Recharts                          |
+| **Icons**                | Lucide React                       |
+| **Testing**              | Vitest (Unit) + Cypress (E2E)      |
 
-   ```bash
-   cp .env.example .env
-   ```
+---
 
-6. Update the `.env` file with your environment variables, particularly:
-   - `VITE_CLERK_PUBLISHABLE_KEY=pk_test_XXXXXXXXXXXXXXXXXXXXXXXX`
-   - `VITE_CLERK_AFTER_SIGN_IN_URL=/app`
-   - `VITE_CLERK_AFTER_SIGN_UP_URL=/app`
-   - `VITE_CLERK_SIGN_IN_URL=/login`
-   - `VITE_CLERK_SIGN_UP_URL=/signup`
+## 💡 How You Can Contribute
 
-### Development
+If you love privacy, open source, and problem-solving, help shape Privanode into the next evolution of local-first computing:
 
-Start the development server:
+- Fork this repository
+- Check open issues → (UI, file structure, docs, templates)
+- Comment on an issue you’d like to work on
+- Create a PR with your improvement
 
-```bash
-npm run dev
+Every contribution counts 💙
+
+You can check current issues like:
+- Adding `CODE_OF_CONDUCT.md`
+- Creating PR Templates
+- Enhancing UI and documentation
+
+---
+
+## 📊 Community Validation
+
+💬 Within 48 hours of survey launch:
+- 18+ users responded
+- Top concerns: limited storage, complex setups, and credit-card-based systems
+- Many showed interest in peer or node-based storage models
+
+### 🖼️ Survey & Response Charts
+
+<img src="./assets/survey-chart-1.png" width="450"/>
+<img src="./assets/survey-chart-2.png" width="450"/>
+
+> *Replace these with your real chart screenshots for the survey.*
+
+---
+
+## ❤️ Contributors
+
+Thanks to everyone helping build Privanode! 🎉
+
+<p align="center">
+    <img src="https://api.vaunt.dev/v1/github/entities/YOUR_ORG_OR_USER/repositories/Privanode/contributors?format=svg&limit=54" width="700" height="250" />
+</p>
+
+<a href="https://github.com/YOUR_ORG_OR_USER/Privanode/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=YOUR_ORG_OR_USER/Privanode" />
+</a>
+
+#### A Big Thank You to Our Contributors! 🎉👏
+
+We’re grateful to our amazing contributors for helping make Privanode a success!
+
+---
+
+## 🔍 FAQ
+
+<details>
+<summary>How is Privanode different from cloud storage platforms?</summary>
+
+Privanode operates on a **local-first, peer-driven architecture** so your data never leaves your control unless you want it to. No cloud, no third-party APIs, no centralized leaks.
+</details>
+
+<details>
+<summary>Do I need a credit card or external identity for setup?</summary>
+
+No! Privanode avoids credit-card-based systems and external tokens entirely. Onboarding is simple and private.
+</details>
+
+<details>
+<summary>How do I contribute?</summary>
+
+Just pick an issue, fork the repo, and send a PR. See [How You Can Contribute](#-how-you-can-contribute) for steps!
+</details>
+
+<details>
+<summary>What survey feedback influenced the project direction?</summary>
+
+Our **first 18+ users** highlighted pain points in cloud systems, setup complexity, and data privacy, leading to peer/node-based storage as our core solution. See charts above!
+</details>
+
+<details>
+<summary>Where can I find documentation?</summary>
+
+Check the `/docs/` folder, README badges, and open GitHub issues for everything from setup to API usage.
+</details>
+
+---
+
+## 📬 Connect
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/salonijoshi2006)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/salonijoshi1980)
+[![Email](https://img.shields.io/badge/Email-D14836?style=flat-square&logo=gmail&logoColor=white)](mailto:your@email.com)
+
+---
+
+## 🌈 License
+
+MIT License © 2025 Veltrian
+
+<div align="center">
+    <a href="#top">
+        <img src="https://img.shields.io/badge/Back%20to%20Top-000000?style=for-the-badge&logo=github&logoColor=white" alt="Back to Top">
+    </a>
+</div>
 ```
 
-The application will be available at `http://localhost:4000` (or another port if 4000 is busy).
+***
 
-### Building for Production
+This design is easily customizable and visually dynamic, ready for your project and survey visuals. Update `YOUR_ORG_OR_USER/Privanode` and image paths as needed!
 
-Create a production build:
-
-```bash
-npm run build
-```
-
-### Type Checking
-
-Run TypeScript type checking:
-
-```bash
-npm run typecheck
-```
-
-## Project Structure
-
-```text
-src/
-├── app/                  # App router structure (editable)
-│   ├── api/              # API routes (editable)
-│   ├── app/              # Main application page
-│   │   └── page.jsx      # Main app component
-│   ├── components/       # Reusable UI components
-│   │   ├── FileManager/  # File management components
-│   │   │   ├── FileList.jsx
-│   │   │   ├── UploadArea.jsx
-│   │   │   ├── PreviewModal.jsx
-│   │   │   ├── PassphraseSetupModal.jsx
-│   │   │   └── index.js
-│   │   ├── Header.jsx    # Global header component
-│   │   └── README.md     # Component documentation
-│   ├── hooks/            # Custom React hooks
-│   │   ├── useFileOperations.js
-│   │   ├── useFormatting.js
-│   │   ├── index.js
-│   │   └── README.md     # Hooks documentation
-│   ├── login/            # Login page (editable)
-│   ├── __create/         # Auto-generated files (do not edit)
-│   ├── layout.jsx        # Root layout (editable)
-│   ├── page.jsx          # Root page (editable)
-│   ├── root.tsx          # Root component (editable)
-│   └── routes.ts         # Route configuration (editable)
-├── utils/                # Utility functions (editable)
-├── __create/             # Auto-generated templates (do not edit)
-└── ...                   # Other auto-generated files (do not edit)
-
-# Editable files:
-# - src/app/ (except __create subdirectory)
-# - src/utils/
-
-# Auto-generated files (do not edit):
-# - src/app/__create/
-# - src/__create/
-# - src/auth.d.ts
-# - src/client.d.ts
-# - src/global.d.ts
-# - build/ (created after build)
-# - node_modules/ (auto-generated by npm)
-```
-
-## Authentication
-
-This project uses Clerk for authentication. Make sure to set up your Clerk account and configure the required environment variables.
-
-## Available Scripts
-
-- `dev`: Start the development server
-- `build`: Create a production build
-- `typecheck`: Run TypeScript type checking
-
-## Learn More
-
-To learn more about the technologies used in this project:
-
-- [React Documentation](https://react.dev/)
-- [Vite Documentation](https://vitejs.dev/)
-- [React Router Documentation](https://reactrouter.com/)
-- [Clerk Documentation](https://clerk.com/docs/)
-- [Tailwind CSS Documentation](https://tailwindcss.com/)
-
-## Deployment
-
-This application can be deployed to various platforms that support Node.js applications, such as Vercel, Netlify, or traditional hosting providers.
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a pull request
