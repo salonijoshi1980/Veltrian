@@ -3,10 +3,25 @@
   "projectOwner": "salonijoshi1980",
   "repoType": "github",
   "repoHost": "https://github.com",
-  "files": ["README.md"],
+  "files": [
+    "README.md"
+  ],
   "imageSize": 100,
   "commit": false,
   "contributorsPerLine": 6,
   "contributorsSortAlphabetically": true,
-  "contributors": []
+  "contributors": [
+    {
+      "login": "Meghana-2124",
+      "name": "Meghana",
+      "avatar_url": "https://avatars.githubusercontent.com/u/204466699?v=4",
+      "profile": "https://github.com/Meghana-2124",
+      "contributions": [
+        "doc",
+        "content"
+      ]
+    }
+  ],
+  "commitType": "docs",
+  "commitConvention": "angular"
 }
