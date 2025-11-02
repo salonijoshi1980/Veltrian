@@ -67,53 +67,145 @@ where users can store, visualize, and control their own data securely and indepe
 ## 🧩 Current Progress
 
 - 🧑‍💻 Built **first MVP (core feature live)**
-- 📊 **18+ user survey responses** in just 2 days
+- 📊 **20+ user survey responses** in just 2 days
 - 💬 Refining setup flow & UI based on real feedback
 - 🧑‍🎓 Balancing **college exams** and **product development**
-- 🌍 Built with help from **10+ open-source contributors**
+- 🌍 Built with help from **open-source contributors**
 
 ---
 
 ## ⚙️ Tech Stack
 
-| Category                 | Technology                         |
-|--------------------------|------------------------------------|
-| **Frontend Framework**   | React 18 + Vite v6                 |
-| **Routing**              | React Router v7                    |
-| **Styling**              | Tailwind CSS v3 + Chakra UI        |
-| **State Management**     | Zustand                            |
-| **Data Fetching**        | TanStack Query (React Query)       |
-| **Authentication**       | Clerk                              |
-| **Charts & Visualization**| Recharts                          |
-| **Icons**                | Lucide React                       |
-| **Testing**              | Vitest (Unit) + Cypress (E2E)      |
-
----
-### Authentication & Backend
-
-| Technology | Description                                   |
-|------------|-----------------------------------------------|
-| Clerk      | Authentication system via environment variables |
-| API Routes | Backend logic primarily in `src/app/api/` directory |
-
-git clone https://github.com/salonijoshi1980/Veltrian.git <br>
-cd Veltrian<br>
-npm install<br>
-npm install react-router<br>
-cp .env.example .env<br>
+| Category                    | Technology                         |
+|----------------------------:|------------------------------------|
+| **Frontend Framework**      | React 18 + Vite v6                 |
+| **Routing**                 | React Router v7                    |
+| **Styling**                 | Tailwind CSS v3 + Chakra UI        |
+| **State Management**        | Zustand                            |
+| **Data Fetching**           | TanStack Query (React Query)       |
+| **Authentication**          | Clerk                              |
+| **Charts & Visualization**  | Recharts                           |
+| **Icons**                   | Lucide React                       |
+| **Testing**                 | Vitest (Unit) + Cypress (E2E)      |
 
 ---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
+- Node.js (version **18** or higher)  
+- npm (comes bundled with Node.js)  
+- A Clerk account (for authentication) — optional for local UI dev, required for auth flows
 
-- Node.js (version 18 or higher)  
-- npm package manager (comes with Node.js)
+### Clone & Install
+```bash
+# Clone the repository
+git clone https://github.com/salonijoshi1980/Veltrian.git
 
-### Installation
+# Go into the project
+cd Veltrian
 
----
+# Install all dependencies
+npm install
+
+# If you prefer yarn optional not need to run this if u use npm:
+yarn
+
+# Install React Router
+npm install react-router
+
+# Environment variables : Create a local .env from the example and fill in Clerk keys and other secrets
+cp .env.example .env
+
+# Example .env (update values with your own keys):
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_XXXXXXXXXXXXXXXXXXXXXXXX
+VITE_CLERK_AFTER_SIGN_IN_URL=/app
+VITE_CLERK_AFTER_SIGN_UP_URL=/app
+VITE_CLERK_SIGN_IN_URL=/login
+VITE_CLERK_SIGN_UP_URL=/signup
+
+# Other environment variables (examples)
+VITE_API_BASE_URL=http://localhost:4000/api
+NODE_ENV=development
+
+Important: Do not commit real secrets — add .env to .gitignore (should already be present).
+
+# Start the dev server:
+npm run dev
+
+# By default the app runs at:
+http://localhost:4000 (if 4000 is busy Vite will choose another port — check your terminal)
+
+# Build for production:
+npm run build
+
+# Run TypeScript type checks:
+npm run typecheck
+```
+
+## 📂 Project Structure
+
+```bash
+src/
+├── app/                   # App router & pages (editable)
+│   ├── api/               # API routes (editable)
+│   ├── app/               # Main application pages (app/page.jsx)
+│   │   └── page.jsx
+│   ├── components/        # Reusable UI components
+│   │   ├── FileManager/   # File manager components
+│   │   │   ├── FileList.jsx
+│   │   │   ├── UploadArea.jsx
+│   │   │   ├── PreviewModal.jsx
+│   │   │   ├── PassphraseSetupModal.jsx
+│   │   │   └── index.js
+│   │   ├── Header.jsx
+│   │   └── README.md
+│   ├── hooks/             # Custom hooks
+│   │   ├── useFileOperations.js
+│   │   ├── useFormatting.js
+│   │   └── README.md
+│   ├── login/             # Login page & auth components
+│   ├── __create/          # Auto-generated files (do not edit)
+│   ├── layout.jsx
+│   └── routes.ts
+├── utils/                 # Utility functions (editable)
+├── assets/                # Images, videos (e.g., demo.mp4)
+└── ...                    # Other auto-generated or config files
+
+# ⚠️ Auto-generated: Do not edit
+# - src/app/__create/
+# - src/__create/
+# - src/auth.d.ts
+# - src/client.d.ts
+# - src/global.d.ts
+# - build/
+# - node_modules/
+
+```
+## 🧑‍💻 Editable Areas for Frontend Contributors
+
+If you're contributing to the **frontend**, you can safely edit the following files and folders:
+
+```bash
+src/app/             # Main application folder (except __create/)
+src/utils/           # Utility functions and helpers
+src/app/components/  # Reusable UI components
+src/app/hooks/       # Custom React hooks
+src/assets/          # Images, videos (e.g., demo.mp4)
+src/app/layout.jsx   # Root layout component
+src/app/routes.ts    # Route configuration
+
+Important:
+
+Do not modify backend logic or auto-generated files — especially those located in:
+src/app/__create/
+src/app/api/
+Authentication setup files (auth.d.ts, Clerk configs, etc.)
+These areas are directly connected to the integrated backend, which handles login and email functionality.
+
+Any backend-related changes should be discussed with the maintainer before making edits.
+
+```
 
 ## 💡 How You Can Contribute
 
@@ -143,30 +235,45 @@ If you find issues or want to add features, check existing issues or open new on
 ## 📊 Community Validation
 
 💬 Within 48 hours of survey launch:
-- 18+ users responded
+- 20+ users responded
 - Top concerns: limited storage, complex setups, and credit-card-based systems
 - Many showed interest in peer or node-based storage models
 
 ### 🖼️ Survey & Response Charts
 
-<img src="./assets/survey-chart-1.png" width="450"/>
-<img src="./assets/survey-chart-2.png" width="450"/>
+<img width="865" height="359" alt="Screenshot 2025-11-02 201411" src="https://github.com/user-attachments/assets/3c070328-3310-48db-a293-95818eda4e48" />
+<img width="864" height="353" alt="Screenshot 2025-11-02 201423" src="https://github.com/user-attachments/assets/51f54d3c-e43a-4e74-b16a-5c60326642d7" />
+<img width="862" height="580" alt="Screenshot 2025-11-02 201435" src="https://github.com/user-attachments/assets/5f9e99df-915f-493b-9072-2442095f0f40" />
+<img width="862" height="385" alt="Screenshot 2025-11-02 201445" src="https://github.com/user-attachments/assets/10c16890-565b-4c52-8530-342ad60f80b7" />
+<img width="863" height="386" alt="Screenshot 2025-11-02 201452" src="https://github.com/user-attachments/assets/c0ea398d-23e7-45ec-9909-816cd50b4950" />
+
 
 > *Replace these with your real chart screenshots for the survey.*
 
 ---
 
-## ❤️ Contributors
+## ❤️ Contributors  
 
-Thanks to everyone helping build Privanode! 🎉
+Thanks to everyone helping build **Veltrian**! 🎉  
+Your support, ideas, and contributions make this project grow stronger every day. 💪  
 
 <p align="center">
-    <img src="https://api.vaunt.dev/v1/github/entities/YOUR_ORG_OR_USER/repositories/Privanode/contributors?format=svg&limit=54" width="700" height="250" />
+  <a href="https://github.com/salonijoshi1980/Veltrian/graphs/contributors">
+    <img src="https://contrib.rocks/image?repo=salonijoshi1980/Veltrian" />
+  </a>
 </p>
 
-<a href="https://github.com/YOUR_ORG_OR_USER/Privanode/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=YOUR_ORG_OR_USER/Privanode" />
-</a>
+<p align="center">
+  <a href="https://github.com/salonijoshi1980/Veltrian">
+    <img src="https://img.shields.io/github/contributors/salonijoshi1980/Veltrian?color=blue&label=Contributors&logo=github" />
+  </a>
+</p>
+
+<p align="center">
+  💖 <b>Want to be featured here?</b>  
+  <br />
+  Contribute to the project by opening issues, fixing bugs, or submitting PRs!
+</p>
 
 #### A Big Thank You to Our Contributors! 🎉👏
 
@@ -219,15 +326,3 @@ Check the `/docs/` folder, README badges, and open GitHub issues for everything 
 ## 🌈 License
 
 MIT License © 2025 Veltrian
-
-<div align="center">
-    <a href="#top">
-        <img src="https://img.shields.io/badge/Back%20to%20Top-000000?style=for-the-badge&logo=github&logoColor=white" alt="Back to Top">
-    </a>
-</div>
-```
-
-***
-
-This design is easily customizable and visually dynamic, ready for your project and survey visuals. Update `YOUR_ORG_OR_USER/Privanode` and image paths as needed!
-
