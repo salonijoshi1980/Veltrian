@@ -1,0 +1,21 @@
+{
+  "projectName": "Veltrian",
+  "projectOwner": "salonijoshi1980",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": ["README.md"],
+  "imageSize": 100,
+  "commit": false,
+  "contributorsPerLine": 6,
+  "contributors": [],
+  "types": {
+    "code": { "symbol": "💻", "description": "Code" },
+    "bug": { "symbol": "🐛", "description": "Bug Fixes" },
+    "doc": { "symbol": "📖", "description": "Documentation" },
+    "design": { "symbol": "🎨", "description": "Design" },
+    "ideas": { "symbol": "💡", "description": "Ideas & Feedback" },
+    "review": { "symbol": "💬", "description": "Code Review" },
+    "infra": { "symbol": "⚙️", "description": "Infrastructure" },
+    "test": { "symbol": "🧪", "description": "Testing" }
+  }
+}
