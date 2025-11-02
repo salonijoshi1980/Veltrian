@@ -254,7 +254,7 @@ If you find issues or want to add features, check existing issues or open new on
 
 ## ❤️ Contributors  : [![GitHub Contributors](https://img.shields.io/github/contributors/salonijoshi1980/Veltrian?color=blue&label=Contributors&logo=github&style=for-the-badge)](https://github.com/salonijoshi1980/Veltrian)
 
-Thanks to everyone helping build **Veltrian**! 🎉  
+Thanks to everyone helping build **Privanode by Veltrian**! 🎉  
 Your ideas, creativity, and efforts make this project stronger every day. 💪  
 
 
