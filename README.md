@@ -252,28 +252,24 @@ If you find issues or want to add features, check existing issues or open new on
 
 ---
 
-## ❤️ Contributors  
+## 🌟 Contributors
 
-Thanks to everyone helping build **Veltrian**! 🎉  
-Your support, ideas, and contributions make this project grow stronger every day. 💪  
+Thanks goes to these amazing people 💖  
 
-<p align="center">
-  <a href="https://github.com/salonijoshi1980/Veltrian/graphs/contributors">
-    <img src="https://contrib.rocks/image?repo=salonijoshi1980/Veltrian" />
-  </a>
-</p>
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/salonijoshi1980"><img src="https://avatars.githubusercontent.com/u/your-user-id?v=4" width="100px;" alt=""/><br /><sub><b>Saloni Joshi</b></sub></a><br />💻 🎨 📖</td>
+  </tr>
+</table>
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+<!-- ALL-CONTRIBUTORS-LIST:END -->
 
-<p align="center">
-  <a href="https://github.com/salonijoshi1980/Veltrian">
-    <img src="https://img.shields.io/github/contributors/salonijoshi1980/Veltrian?color=blue&label=Contributors&logo=github" />
-  </a>
-</p>
-
-<p align="center">
-  💖 <b>Want to be featured here?</b>  
-  <br />
-  Contribute to the project by opening issues, fixing bugs, or submitting PRs!
-</p>
+💡 Want to join them?  
+Open an issue, contribute code, or help with docs/design — every contribution counts!
 
 #### A Big Thank You to Our Contributors! 🎉👏
 
