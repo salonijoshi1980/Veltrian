@@ -245,9 +245,6 @@ If you find issues or want to add features, check existing issues or open new on
 <img width="862" height="385" alt="Screenshot 2025-11-02 201445" src="https://github.com/user-attachments/assets/10c16890-565b-4c52-8530-342ad60f80b7" />
 <img width="863" height="386" alt="Screenshot 2025-11-02 201452" src="https://github.com/user-attachments/assets/c0ea398d-23e7-45ec-9909-816cd50b4950" />
 
-
-> *Replace these with your real chart screenshots for the survey.*
-
 ---
 
 
