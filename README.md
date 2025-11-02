@@ -252,30 +252,34 @@ If you find issues or want to add features, check existing issues or open new on
 
 ---
 
-## 🌟 Contributors
+## ❤️ Contributors  : [![GitHub Contributors](https://img.shields.io/github/contributors/salonijoshi1980/Veltrian?color=blue&label=Contributors&logo=github&style=for-the-badge)](https://github.com/salonijoshi1980/Veltrian)
 
-Thanks goes to these amazing people 💖  
+<div align="center">
+
+[![Contributors](https://contrib.rocks/image?repo=salonijoshi1980/Veltrian&max=500)](https://github.com/salonijoshi1980/Veltrian/graphs/contributors)
+
+</div>
+
+Thanks to everyone helping build **Veltrian**! 🎉  
+Your ideas, creativity, and efforts make this project stronger every day. 💪  
+
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
+
+<div align="center">
 <table>
   <tr>
-    <td align="center"><a href="https://github.com/salonijoshi1980"><img src="https://avatars.githubusercontent.com/u/your-user-id?v=4" width="100px;" alt=""/><br /><sub><b>Saloni Joshi</b></sub></a><br />💻 🎨 📖</td>
+    <!-- The All Contributors Bot will automatically add GitHub profile images below -->
   </tr>
 </table>
+</div>
+
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
-💡 Want to join them?  
-Open an issue, contribute code, or help with docs/design — every contribution counts!
-
-#### A Big Thank You to Our Contributors! 🎉👏
-
-We’re grateful to our amazing contributors for helping make Privanode a success!
-
----
 
 ## 🔍 FAQ
 
