@@ -254,12 +254,6 @@ If you find issues or want to add features, check existing issues or open new on
 
 ## ❤️ Contributors  : [![GitHub Contributors](https://img.shields.io/github/contributors/salonijoshi1980/Veltrian?color=blue&label=Contributors&logo=github&style=for-the-badge)](https://github.com/salonijoshi1980/Veltrian)
 
-<div align="center">
-
-[![Contributors](https://contrib.rocks/image?repo=salonijoshi1980/Veltrian&max=500)](https://github.com/salonijoshi1980/Veltrian/graphs/contributors)
-
-</div>
-
 Thanks to everyone helping build **Veltrian**! 🎉  
 Your ideas, creativity, and efforts make this project stronger every day. 💪  
 
