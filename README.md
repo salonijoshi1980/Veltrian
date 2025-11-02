@@ -48,10 +48,9 @@ Currently building the **first user-driven version** with insights from **20+ re
 3. [⚙️ Tech Stack](#️-tech-stack)
 4. [💡 How You Can Contribute](#-how-you-can-contribute)
 5. [📊 Community Validation](#-community-validation)
-6. [❤️ Contributors](#-contributors)
-7. [🔍 FAQ](#-faq)
-8. [📬 Connect](#-connect)
-9. [🌈 License](#-license)
+6. [🔍 FAQ](#-faq)
+7. [📬 Connect](#-connect)
+8. [🌈 License](#-license)
 
 <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png"/>
 
@@ -219,9 +218,8 @@ If you love privacy, open source, and problem-solving, help shape Privanode into
 Every contribution counts 💙
 
 You can check current issues like:
-- Adding `CODE_OF_CONDUCT.md`
 - Creating PR Templates
-- Enhancing UI and documentation
+- Enhancing UI and documentation and more
 
 ## 🤝 Contributing
 
