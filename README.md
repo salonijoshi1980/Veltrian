@@ -2,7 +2,7 @@
 > **Your data. Your node. Your control.**
 
 A **privacy-first storage platform** — no cloud, no server, no data leaks.
-Currently building the **first user-driven version** with insights from **18+ real users** and a growing open-source community.
+Currently building the **first user-driven version** with insights from **20+ real users** and a growing open-source community.
 
 <br/>
   <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png"/>
