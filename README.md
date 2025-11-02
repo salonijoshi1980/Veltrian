@@ -8,7 +8,7 @@ Currently building the **first user-driven version** with insights from **18+ re
   <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png"/>
 <br/>
 
-<div align="center">
+<<div align="center">
   <table align="center">
     <thead align="center">
       <tr>
@@ -21,14 +21,15 @@ Currently building the **first user-driven version** with insights from **18+ re
     </thead>
     <tbody>
       <tr>
-        <td><img alt="Stars" src="https://img.shields.io/github/stars/YOUR_ORG_OR_USER/Privanode?style=flat&logo=github" /></td>
-        <td><img alt="Forks" src="https://img.shields.io/github/forks/YOUR_ORG_OR_USER/Privanode?style=flat&logo=github" /></td>
-        <td><img alt="Issues" src="https://img.shields.io/github/issues/YOUR_ORG_OR_USER/Privanode?style=flat&logo=github" /></td>
-        <td><img alt="Open PRs" src="https://img.shields.io/github/issues-pr/YOUR_ORG_OR_USER/Privanode?style=flat&logo=github" /></td>
-        <td><img alt="Closed PRs" src="https://img.shields.io/github/issues-pr-closed/YOUR_ORG_OR_USER/Privanode?style=flat&color=critical&logo=github" /></td>
+        <td><img alt="Stars" src="https://img.shields.io/github/stars/salonijoshi1980/Veltrian?style=flat&logo=github" /></td>
+        <td><img alt="Forks" src="https://img.shields.io/github/forks/salonijoshi1980/Veltrian?style=flat&logo=github" /></td>
+        <td><img alt="Issues" src="https://img.shields.io/github/issues/salonijoshi1980/Veltrian?style=flat&logo=github" /></td>
+        <td><img alt="Open PRs" src="https://img.shields.io/github/issues-pr/salonijoshi1980/Veltrian?style=flat&logo=github" /></td>
+        <td><img alt="Closed PRs" src="https://img.shields.io/github/issues-pr-closed/salonijoshi1980/Veltrian?style=flat&color=critical&logo=github" /></td>
       </tr>
     </tbody>
   </table>
+
 
   <!-- Tech stack badges -->
   ![React](https://img.shields.io/badge/React-18-blue?style=for-the-badge&logo=react)
@@ -86,6 +87,31 @@ where users can store, visualize, and control their own data securely and indepe
 | **Charts & Visualization**| Recharts                          |
 | **Icons**                | Lucide React                       |
 | **Testing**              | Vitest (Unit) + Cypress (E2E)      |
+
+---
+### Authentication & Backend
+
+| Technology | Description                                   |
+|------------|-----------------------------------------------|
+| Clerk      | Authentication system via environment variables |
+| API Routes | Backend logic primarily in `src/app/api/` directory |
+
+git clone https://github.com/salonijoshi1980/Veltrian.git <br>
+cd Veltrian<br>
+npm install<br>
+npm install react-router<br>
+cp .env.example .env<br>
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js (version 18 or higher)  
+- npm package manager (comes with Node.js)
+
+### Installation
 
 ---
 
