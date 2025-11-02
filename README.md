@@ -267,17 +267,17 @@ Your ideas, creativity, and efforts make this project stronger every day. 💪
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
-
-<div align="center">
 <table>
-  <tr>
-    <!-- The All Contributors Bot will automatically add GitHub profile images below -->
-  </tr>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="16.66%"><a href="https://github.com/Meghana-2124"><img src="https://avatars.githubusercontent.com/u/204466699?v=4?s=100" width="100px;" alt="Meghana"/><br /><sub><b>Meghana</b></sub></a><br /><a href="https://github.com/salonijoshi1980/Veltrian/commits?author=Meghana-2124" title="Documentation">📖</a> <a href="#content-Meghana-2124" title="Content">🖋</a></td>
+    </tr>
+  </tbody>
 </table>
-</div>
 
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 
