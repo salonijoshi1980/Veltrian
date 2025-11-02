@@ -8,7 +8,7 @@ Currently building the **first user-driven version** with insights from **18+ re
   <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png"/>
 <br/>
 
-<<div align="center">
+<div align="center">
   <table align="center">
     <thead align="center">
       <tr>
