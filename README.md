@@ -252,29 +252,6 @@ If you find issues or want to add features, check existing issues or open new on
 
 ---
 
-## ❤️ Contributors  : [![GitHub Contributors](https://img.shields.io/github/contributors/salonijoshi1980/Veltrian?color=blue&label=Contributors&logo=github&style=for-the-badge)](https://github.com/salonijoshi1980/Veltrian)
-
-Thanks to everyone helping build **Privanode by Veltrian**! 🎉  
-Your ideas, creativity, and efforts make this project stronger every day. 💪  
-
-
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<table>
-  <tbody>
-    <tr>
-      <td align="center" valign="top" width="16.66%"><a href="https://github.com/ks9128"><img src="https://avatars.githubusercontent.com/u/150775356?v=4?s=100" width="100px;" alt="Khalid Saifullah"/><br /><sub><b>Khalid Saifullah</b></sub></a><br /><a href="https://github.com/salonijoshi1980/Veltrian/commits?author=ks9128" title="Code">💻</a> <a href="https://github.com/salonijoshi1980/Veltrian/commits?author=ks9128" title="Documentation">📖</a></td>
-      <td align="center" valign="top" width="16.66%"><a href="https://github.com/Meghana-2124"><img src="https://avatars.githubusercontent.com/u/204466699?v=4?s=100" width="100px;" alt="Meghana"/><br /><sub><b>Meghana</b></sub></a><br /><a href="https://github.com/salonijoshi1980/Veltrian/commits?author=Meghana-2124" title="Documentation">📖</a> <a href="#content-Meghana-2124" title="Content">🖋</a></td>
-    </tr>
-  </tbody>
-</table>
-
-<!-- markdownlint-restore -->
-<!-- prettier-ignore-end -->
-
-<!-- ALL-CONTRIBUTORS-LIST:END -->
-
 
 ## 🔍 FAQ
 
