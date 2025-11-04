@@ -1,0 +1,37 @@
+{
+  "projectName": "Veltrian",
+  "projectOwner": "salonijoshi1980",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributorsPerLine": 6,
+  "contributorsSortAlphabetically": true,
+  "contributors": [
+    {
+      "login": "Meghana-2124",
+      "name": "Meghana",
+      "avatar_url": "https://avatars.githubusercontent.com/u/204466699?v=4",
+      "profile": "https://github.com/Meghana-2124",
+      "contributions": [
+        "doc",
+        "content"
+      ]
+    },
+    {
+      "login": "ks9128",
+      "name": "Khalid Saifullah",
+      "avatar_url": "https://avatars.githubusercontent.com/u/150775356?v=4",
+      "profile": "https://github.com/ks9128",
+      "contributions": [
+        "code",
+        "doc"
+      ]
+    }
+  ],
+  "commitType": "docs",
+  "commitConvention": "angular"
+}
