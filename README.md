@@ -4,7 +4,7 @@
 A **privacy-first storage platform** — no cloud, no server, no data leaks.
 Currently building the **first user-driven version** with insights from **20+ real users** and a growing open-source community.
 
-**Give your opinion here and join us on this journey**: [Share your feedback](https://forms.gle/3TnfVDaMtrtTWK469)
+**Give your opinion here and join us on this journey**: (https://forms.gle/3TnfVDaMtrtTWK469)
 <br/>
   <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png"/>
 <br/>
