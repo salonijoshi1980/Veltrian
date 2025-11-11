@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -8,6 +9,7 @@ export default function HomePage() {
   const [submitMessage, setSubmitMessage] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const [contributors, setContributors] = useState([]);
+  const submitTimeoutRef = useRef(null);
 
   const stats = [
     { number: "100%", label: "Private" },
@@ -77,8 +79,8 @@ export default function HomePage() {
       
       setSubmitMessage("Thank you! We'll keep you updated on Veltrian's progress.");
       setEmail("");
-      
-      setTimeout(() => {
+
+      submitTimeoutRef.current = setTimeout(() => {
         setSubmitMessage("");
         setIsSubmitting(false);
       }, 3000);
@@ -88,6 +90,14 @@ export default function HomePage() {
       setIsSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    return () => {
+      if (submitTimeoutRef.current) {
+        clearTimeout(submitTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-purple-50 to-blue-50">
