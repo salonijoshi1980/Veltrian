@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "react-router dev",
     "build": "react-router build",
-    "typecheck": "react-router typegen && tsc --noEmit"
+    "typecheck": "react-router typegen && tsc --noEmit",
+    "lint": "npm run typecheck"
   },
   "dependencies": {
     "@auth/core": "^0.37.4",
