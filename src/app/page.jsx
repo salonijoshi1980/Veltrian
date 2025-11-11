@@ -134,17 +134,50 @@ export default function HomePage() {
             </p>
           </div>
 
-          <form onSubmit={handleEmailSubmit} name="newsletter" method="POST" data-netlify="true" className={`max-w-md mx-auto mb-16 transition-all duration-1000 delay-300 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}>
+          <form
+              onSubmit={handleEmailSubmit}
+              name="newsletter"
+              method="POST"
+              data-netlify="true"
+              data-netlify-honeypot="bot-field"
+              className={`max-w-md mx-auto mb-16 transition-all duration-1000 delay-300 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
+          >
             <input type="hidden" name="form-name" value="newsletter" />
+
+            {/* Honeypot field (hidden from users but visible to bots) */}
+            <p className="hidden" aria-hidden="true">
+              <label>
+                Don’t fill this out if you’re human:{" "}
+                <input name="bot-field" type="text" />
+              </label>
+            </p>
+
             <div className="flex flex-col sm:flex-row rounded-2xl border-2 border-purple-200 bg-white shadow-lg overflow-hidden">
-              <input type="email" name="email" placeholder="Enter your email..." value={email} onChange={(e) => setEmail(e.target.value)} required className="flex-1 px-6 py-4 text-slate-700 focus:outline-none" />
-              <button type="submit" disabled={isSubmitting} className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-8 py-4 font-semibold hover:shadow-xl transition-all disabled:opacity-50">
+              <input
+                  type="email"
+                  name="email"
+                  placeholder="Enter your email..."
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="flex-1 px-6 py-4 text-slate-700 focus:outline-none"
+              />
+              <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-8 py-4 font-semibold hover:shadow-xl transition-all disabled:opacity-50"
+              >
                 {isSubmitting ? "Subscribing..." : "Subscribe"}
               </button>
             </div>
-            {submitMessage && <p className="mt-3 text-sm text-green-600 font-medium">{submitMessage}</p>}
-            <p className="text-slate-500 text-sm mt-3">By entering your email, you agree to receive updates from Veltrian.</p>
+            {submitMessage && (
+                <p className="mt-3 text-sm text-green-600 font-medium">{submitMessage}</p>
+            )}
+            <p className="text-slate-500 text-sm mt-3">
+              By entering your email, you agree to receive updates from Veltrian.
+            </p>
           </form>
+
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-4xl mx-auto">
             {stats.map((stat, index) => (
