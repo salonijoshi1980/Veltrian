@@ -4,6 +4,7 @@
 A **privacy-first storage platform** — no cloud, no server, no data leaks.
 Currently building the **first user-driven version** with insights from **20+ real users** and a growing open-source community.
 
+**Give your opinion here and join us on this journey**: (https://forms.gle/3TnfVDaMtrtTWK469)
 <br/>
   <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png"/>
 <br/>
@@ -48,10 +49,9 @@ Currently building the **first user-driven version** with insights from **20+ re
 3. [⚙️ Tech Stack](#️-tech-stack)
 4. [💡 How You Can Contribute](#-how-you-can-contribute)
 5. [📊 Community Validation](#-community-validation)
-6. [❤️ Contributors](#-contributors)
-7. [🔍 FAQ](#-faq)
-8. [📬 Connect](#-connect)
-9. [🌈 License](#-license)
+6. [🔍 FAQ](#-faq)
+7. [📬 Connect](#-connect)
+8. [🌈 License](#-license)
 
 <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png"/>
 
@@ -219,14 +219,13 @@ If you love privacy, open source, and problem-solving, help shape Privanode into
 Every contribution counts 💙
 
 You can check current issues like:
-- Adding `CODE_OF_CONDUCT.md`
 - Creating PR Templates
-- Enhancing UI and documentation
+- Enhancing UI and documentation and more
 
 ## 🤝 Contributing
 
 We welcome contributions from the community!  
-Please read our [Contribution Guidelines.md](./CONTRIBUTING.md) for detailed guidelines on how to create issues, submit pull requests, and maintain code quality.
+Please read our [Contribution Guidelines](./CONTRIBUTING.md) for detailed instructions on how to create issues, submit pull requests, and maintain code quality.
 
 If you find issues or want to add features, check existing issues or open new ones. Every contribution counts! 💙
 
@@ -246,9 +245,6 @@ If you find issues or want to add features, check existing issues or open new on
 <img width="862" height="580" alt="Screenshot 2025-11-02 201435" src="https://github.com/user-attachments/assets/5f9e99df-915f-493b-9072-2442095f0f40" />
 <img width="862" height="385" alt="Screenshot 2025-11-02 201445" src="https://github.com/user-attachments/assets/10c16890-565b-4c52-8530-342ad60f80b7" />
 <img width="863" height="386" alt="Screenshot 2025-11-02 201452" src="https://github.com/user-attachments/assets/c0ea398d-23e7-45ec-9909-816cd50b4950" />
-
-
-> *Replace these with your real chart screenshots for the survey.*
 
 ---
 
