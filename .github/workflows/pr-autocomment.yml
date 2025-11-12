@@ -1,49 +1,30 @@
-name: PR Auto Comment
+name: Auto Comment on PR
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened]
+
+permissions:
+  issues: write
+  pull-requests: write
 
 jobs:
   comment:
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-    
     steps:
       - name: Comment on PR
-        uses: actions/github-script@v7
+        uses: actions/github-script@v6
         with:
           script: |
-            const prNumber = context.payload.pull_request.number;
-            const prAuthor = context.payload.pull_request.user.login;
-            
-            const message = `👋 Hey @${prAuthor}! Thanks for opening this PR!
+            const prNumber = context.issue.number;
 
-            ## 📋 Next Steps
-            
-            - ✅ Make sure your code follows the project's coding standards
-            - ✅ Ensure all tests pass
-            - ✅ Update documentation if needed
-            - ✅ Link any related issues using "Fixes #issue_number"
-            - ✅ Wait for maintainer review
-            
-            ## 🔍 Review Process
-            
-            A maintainer will review your PR soon. Please be patient and address any feedback promptly.
-            
-            ## 💡 Tips
-            
-            - Keep your PR focused on a single feature/fix
-            - Write clear commit messages
-            - Respond to review comments
-            - Test your changes thoroughly
-            
-            Thank you for contributing to Veltrian! 🚀`;
-            
+            const commentBody = `### Thanks for creating a PR for your Issue! ☺️\n\nWe'll review it as soon as possible.\nIn the meantime, please double-check the **file changes** and ensure that **all commits** are accurate.\n\nIf there are any **unresolved review comments**, feel free to resolve them. 🙌🏼`;
+
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: prNumber,
-              body: message
+              body: commentBody
             });
+
+            console.log('Comment added successfully.');
