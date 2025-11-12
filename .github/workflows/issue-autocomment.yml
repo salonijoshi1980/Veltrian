@@ -1,49 +1,30 @@
-name: Issue Auto Comment
+name: Auto Comment on Issue
 
 on:
   issues:
     types: [opened]
 
+permissions:
+  issues: write
+
 jobs:
   comment:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
-    
     steps:
-      - name: Comment on Issue
-        uses: actions/github-script@v7
+      - name: Add Comment to Issue
+        uses: actions/github-script@v6
         with:
           script: |
-            const issueNumber = context.payload.issue.number;
-            const issueAuthor = context.payload.issue.user.login;
-            
-            const message = `👋 Hello @${issueAuthor}! Thanks for opening this issue!
+            const issueNumber = context.issue.number;
 
-            ## 📝 What's Next?
-            
-            - ✅ A maintainer will review your issue soon
-            - ✅ Please provide as much detail as possible
-            - ✅ If reporting a bug, include steps to reproduce
-            - ✅ If requesting a feature, explain the use case
-            
-            ## 🏷️ Labels
-            
-            Appropriate labels will be added by maintainers to help categorize your issue.
-            
-            ## ⏱️ Response Time
-            
-            We aim to respond to all issues within 48 hours. Thank you for your patience!
-            
-            ## 🤝 Want to Contribute?
-            
-            If you'd like to work on this issue yourself, please wait for maintainer approval and assignment.
-            
-            Thank you for helping improve Veltrian! 🚀`;
-            
+            const commentBody1 = `### Thank you for raising this issue!\n We'll review it as soon as possible. We truly appreciate your contributions! ✨\n\n> Meanwhile make sure you've visited the README.md, CONTRIBUTING.md, and CODE_OF_CONDUCT.md before creating a PR for this. Also, please do NOT create a PR until this issue has been assigned to you. 😊`;
+
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issueNumber,
-              body: message
+              body: commentBody1
             });
+
+
+            console.log('comment added successfully.');
