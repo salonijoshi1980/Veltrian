@@ -1,0 +1,6 @@
+[build]
+  command = "npm install --force && npm run build"
+  publish = "build/client"
+
+[build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "VITE_CLERK_PUBLISHABLE_KEY"
