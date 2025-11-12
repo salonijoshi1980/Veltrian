@@ -1,0 +1,2 @@
+[build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "VITE_CLERK_PUBLISHABLE_KEY"
