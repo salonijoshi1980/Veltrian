@@ -1,6 +1,7 @@
 [build]
-  command = "npm install --force && npm run build"
+  command = "npm install --legacy-peer-deps && npm run build"
   publish = "build/client"
 
 [build.environment]
+  NODE_VERSION = "22"
   SECRETS_SCAN_OMIT_KEYS = "VITE_CLERK_PUBLISHABLE_KEY"
