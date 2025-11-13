@@ -29,13 +29,13 @@ export default function LoginPage() {
       <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full border border-slate-200">
         <div className="mb-8 text-center">
           <div className="flex items-center justify-center">
-            <img
+            {/* <img
               src="/Dragon logo1.png"
               alt="Veltrian Logo"
               className="w-12 h-12 object-contain -mr-2"
-            />
+            /> */}
             <span className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent pt-0.5">
-              eltrian
+              Privanode
             </span>
           </div>
           <p className="text-slate-600 mt-2">Cloudless File Manager</p>
