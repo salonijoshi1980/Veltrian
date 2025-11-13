@@ -9,6 +9,9 @@ Currently building the **first user-driven version** with insights from **20+ re
   <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png"/>
 <br/>
 
+<img width="1577" height="922" alt="image" src="https://github.com/user-attachments/assets/efec8137-bafd-4187-a81b-7e7f3e776db6" />
+
+
 <div align="center">
   <table align="center">
     <thead align="center">
