@@ -24,17 +24,17 @@ export default function AppPage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
         <div className="text-center">
           <div className="flex items-center justify-center mb-6">
-            <img
+            {/* <img
               src="/Dragon logo1.png"
               alt="Veltrian Logo"
               className="w-16 h-16 object-contain mr-4"
-            />
+            /> */}
             <span className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-              eltrian
+              Privanode
             </span>
           </div>
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-slate-600 font-medium">
+          <p className="text-slate-600 font-medium text-center">
             Loading your workspace...
           </p>
         </div>
@@ -506,13 +506,13 @@ export default function AppPage() {
           <div className="max-w-md w-full text-center">
             <div className="mb-8">
               <div className="flex items-center justify-center">
-                <img
+                {/* <img
                   src="/Dragon logo1.png"
                   alt="Veltrian Logo"
                   className="w-16 h-16 object-contain -mr-4"
-                />
+                /> */}
                 <span className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent pt-1">
-                  eltrian
+                  Privanode
                 </span>
               </div>
               <p className="text-gray-600">
@@ -593,11 +593,11 @@ export default function AppPage() {
               </div>
             ) : (
               <div className="flex items-center space-x-4">
-                {extendedGuestMode && (
+                {/* {extendedGuestMode && (
                   <div className="flex items-center space-x-2 text-sm text-slate-700 bg-slate-100 px-3 py-1 rounded-full">
                     <span>⚠️ Export Backup to Save Work</span>
                   </div>
-                )}
+                )} */}
                 <SignInButton mode="modal">
                   <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-purple-500 to-blue-500 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
                     Login to Save

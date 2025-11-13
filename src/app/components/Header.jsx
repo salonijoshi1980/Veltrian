@@ -12,13 +12,13 @@ export default function Header() {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <div className="flex items-center">
-              <img
+              {/* <img
                 src="/Dragon logo1.png"
                 alt="Veltrian Logo"
                 className="w-11 h-9 object-contain -mr-3"
-              />
+              /> */}
               <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent pt-0.5">
-                eltrian
+                Privanode
               </span>
             </div>
           </div>

@@ -104,33 +104,33 @@ export default function HomePage() {
       <nav className="w-full bg-white/80 backdrop-blur-md fixed top-0 z-50 border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-1">
-            <img src="/Dragon logo1.png" alt="Veltrian Logo" className="w-10 h-10 md:w-12 md:h-12 object-contain" />
-            <span className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Veltrian</span>
+            {/* <img src="/Dragon logo1.png" alt="Veltrian Logo" className="w-10 h-10 md:w-12 md:h-12 object-contain" /> */}
+            <span className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Privanode</span>
           </div>
 
           <div className="flex items-center space-x-2 md:space-x-4">
-            <a href="https://forms.gle/your-survey-link" target="_blank" rel="noopener noreferrer" className="text-sm md:text-base text-slate-600 hover:text-purple-600 font-medium transition">Survey</a>
+            <a href="https://forms.gle/JD4i1NbFeHjjmGi69" target="_blank" rel="noopener noreferrer" className="text-sm md:text-base text-slate-600 hover:text-purple-600 font-medium transition">Survey</a>
             <a href="https://github.com/salonijoshi1980/Veltrian" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-2 text-sm md:text-base text-slate-600 hover:text-purple-600 font-medium transition">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
               </svg>
               <span className="hidden md:inline">GitHub</span>
             </a>
-            <img src="https://img.shields.io/github/contributors/salonijoshi1980/Veltrian?style=flat-square&color=purple" alt="Contributors" className="h-5" />
+            
             <button onClick={() => navigate("/login")} className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 md:px-6 py-2 rounded-lg font-medium text-sm md:text-base hover:shadow-lg transition-all hover:scale-105">Login</button>
           </div>
         </div>
       </nav>
 
-      <section className="pt-32 pb-20 px-6 sm:px-10">
+      <section className="pt-32 pb-20 px-6 sm:px-10 mt-16">
         <div className="max-w-6xl mx-auto text-center">
           <div className={`transition-all duration-1000 transform ${isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}>
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-slate-900 mb-6">
-              Your Private Cloud, Your
+              Your Limitless Storage,Your
               <span className="block bg-gradient-to-r from-purple-600 via-pink-500 to-blue-600 bg-clip-text text-transparent mt-2">Intelligence Workspace</span>
             </h1>
             <p className="text-lg md:text-xl text-slate-600 mb-10 max-w-3xl mx-auto leading-relaxed">
-              No cloud. No servers. No data leaks. Just you and your files.<br />Upload, Organize, and Store everything 100% privately.
+              Your Data. Your Node. Your Control.<br />Upload, Preview, and Store everything 100% privately.
             </p>
           </div>
 
@@ -178,20 +178,20 @@ export default function HomePage() {
             </p>
           </form>
 
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-4xl mx-auto">
+            {/* statistics don't remove it, Needed later */}
+          {/* <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-4xl mx-auto">
             {stats.map((stat, index) => (
               <div key={index} className="bg-white rounded-2xl p-6 shadow-lg border border-purple-100 hover:shadow-xl transition-all duration-300 hover:scale-105">
                 <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">{stat.number}</div>
                 <div className="text-slate-600 text-sm font-medium">{stat.label}</div>
               </div>
             ))}
-          </div>
+          </div> */}
         </div>
       </section>
 
       {/* How It Works section*/}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-16">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-16 -mt-28">
         <div className="bg-white rounded-2xl p-6 sm:p-10 shadow-sm border border-slate-200">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-8 text-center">
             How It Works
@@ -284,7 +284,7 @@ export default function HomePage() {
       <section className="py-20 px-6 bg-gradient-to-b from-purple-50 to-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-bold text-center text-slate-900 mb-4">See It In Action</h2>
-          <p className="text-center text-slate-600 text-lg mb-12">Watch how Veltrian transforms your file management experience</p>
+          <p className="text-center text-slate-600 text-lg mb-12">Watch how Privanode transforms your file storage,management experience</p>
           <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200">
             <video
               autoPlay
@@ -304,7 +304,7 @@ export default function HomePage() {
 
       <section className="py-20 px-6">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-center text-slate-900 mb-4">Why Choose Veltrian?</h2>
+          <h2 className="text-4xl md:text-5xl font-bold text-center text-slate-900 mb-4">Why Choose Privanode?</h2>
           <p className="text-center text-slate-600 text-lg mb-16">Everything you need for secure, private file management</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {features.map((feature, index) => (
@@ -394,7 +394,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="border-t border-slate-800 pt-8 text-center text-slate-400">
-            <p>© {new Date().getFullYear()} Veltrian. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} Privanode. All rights reserved.</p>
           </div>
         </div>
       </footer>
