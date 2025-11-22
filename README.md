@@ -95,10 +95,22 @@ where users can store, visualize, and control their own data securely and indepe
 
 ## 🚀 Getting Started
 
-### Prerequisites
-- Node.js (version **18** or higher)  
-- npm (comes bundled with Node.js)  
-- A Clerk account (for authentication) — optional for local UI dev, required for auth flows
+---
+
+## 🤝 Contributing
+
+We welcome contributions from everyone! Whether it's a new feature, a bug fix, or documentation improvements, your help is valuable.
+
+To contribute effectively and get your changes merged quickly:
+
+1.  **Read our detailed guide:** Please review our complete **[Contribution Guidelines](CONTRIBUTING.md)** first.
+2.  **Report a Bug/Suggest an Enhancement:** Check the [Issues](https://github.com/salonijoshi1980/Veltrian/issues) section to see if your issue or suggestion already exists. If not, feel free to **[open a new issue](https://github.com/salonijoshi1980/Veltrian/issues/new/choose)**.
+
+### Git Ready: Your First Contribution Steps
+
+Follow these basic steps to get started with your contribution:
+
+###  **Fork** the repository to your GitHub account.
 
 ### Clone & Install
 ```bash
